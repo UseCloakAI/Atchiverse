@@ -9,4 +9,6 @@ Personalized learning app for Atchi (6th grade, CA curriculum, ADHD). Separate f
 ## Stack
 - Static site, no build. `index.html` + `src/` (vanilla JS modules).
 - Content (questions, lessons) lives in `src/content.js`.
+- Supabase project `flsjetuwysxzrlscigww` (Atchiverse). Tables RLS-locked; browser uses RPCs only (`src/cloud.js`). Schema in `supabase/`. Never commit PINs.
+- TTS: `src/speech.js` → Cloak API, browser voice fallback.
 - TTS available via Cloak API: `POST https://api.usecloak.org/v1/speech {text}` → audio/wav.

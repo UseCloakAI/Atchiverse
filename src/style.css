@@ -40,3 +40,16 @@ main { max-width: 640px; margin: 0 auto; padding: 16px; }
 @keyframes rise { to { transform: translate(-50%, -150%); opacity: 0; } }
 @media (max-width: 480px) { .choices { grid-template-columns: 1fr; } }
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+.hud { align-items: center; }
+.toggle { font: inherit; font-size: .9rem; color: var(--ink); background: #ffffff14; border: 1px solid #ffffff22; border-radius: 999px; padding: 4px 10px; cursor: pointer; }
+.qrow { display: flex; align-items: center; gap: 10px; }
+.qrow h2 { flex: 1; }
+.spk { font-size: 1.4rem; background: #ffffff14; border: 1px solid #ffffff22; border-radius: 50%; width: 48px; height: 48px; cursor: pointer; flex-shrink: 0; }
+.spk:hover { background: #ffffff24; }
+.dots { display: flex; justify-content: center; gap: 14px; margin: 16px 0 8px; }
+.dots span { width: 18px; height: 18px; border-radius: 50%; border: 2px solid var(--muted); }
+.dots span.on { background: var(--accent); border-color: var(--accent); }
+.err { color: var(--bad); min-height: 1.5em; margin: 4px 0; }
+.pad { display: grid; grid-template-columns: repeat(3, 72px); gap: 12px; justify-content: center; }
+.key { font: inherit; font-size: 1.5rem; font-weight: 700; color: var(--ink); background: #ffffff10; border: 2px solid #ffffff22; border-radius: 50%; width: 72px; height: 72px; cursor: pointer; }
+.key:active { background: var(--accent); }

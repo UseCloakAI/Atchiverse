@@ -11,6 +11,8 @@ Local: Static site, no build. `python3 -m http.server` → open `localhost:8000`
 - **Adaptive level check** — 6 math + 6 reading Qs, walks grade 1–6 up/down to find his level.
 - **Missions** — 3‑min lessons (hook → example → 3 practice), picked from missed skills + next grade up.
 - **ADHD-friendly** — XP, streaks, stars, instant feedback, brain break every 8 min, short chunks.
-- Progress saved in localStorage.
+- **PIN login** → progress + every answer synced to Supabase (`answers` table).
+- **Read-aloud** — 🔊 on every card + auto-read toggle (Cloak TTS, browser voice fallback).
+- 27 lessons covering every skill the level check tests.
 
 Content lives in `src/content.js`.

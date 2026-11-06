@@ -126,4 +126,188 @@ export const LESSONS = {
       { q: '"Ben hid behind the couch during the movie." The movie was…', a: 'scary', choices: ['funny', 'boring', 'scary', 'short'] },
     ],
   },
+
+  // ── Math backfill + grade-level ────────────────────────────────────────
+  'add-20': {
+    title: 'Make a 10', subject: 'math', g: 1,
+    hook: 'Adding to 20 is easier if you fill up to 10 first, then add the rest.',
+    example: '7 + 5 → 7 + 3 = 10 → 10 + 2 = 12',
+    practice: [
+      { q: '8 + 6 = ?', a: '14', choices: ['13', '14', '15', '86'] },
+      { q: '9 + 4 = ?', a: '13', choices: ['12', '13', '14', '5'] },
+      { q: '6 + 7 = ?', a: '13', choices: ['12', '13', '14', '11'] },
+    ],
+  },
+  'sub-20': {
+    title: 'Count Up to Subtract', subject: 'math', g: 1,
+    hook: 'For 15 − 6, start at 6 and count up to 15. How far did you go? That\'s the answer.',
+    example: '15 − 6 → 6 to 10 is 4, 10 to 15 is 5 → 4 + 5 = 9',
+    practice: [
+      { q: '14 − 8 = ?', a: '6', choices: ['5', '6', '7', '22'] },
+      { q: '17 − 9 = ?', a: '8', choices: ['7', '8', '9', '12'] },
+      { q: '12 − 5 = ?', a: '7', choices: ['6', '7', '8', '17'] },
+    ],
+  },
+  'div-facts': {
+    title: 'Division = Splitting Up', subject: 'math', g: 3,
+    hook: '56 ÷ 8 asks: how many 8s fit in 56? Flip it into a times fact: 8 × ? = 56.',
+    example: '56 ÷ 8 → 8 × 7 = 56 → 7',
+    practice: [
+      { q: '24 ÷ 6 = ?', a: '4', choices: ['3', '4', '6', '18'] },
+      { q: '45 ÷ 9 = ?', a: '5', choices: ['4', '5', '6', '36'] },
+      { q: '32 ÷ 4 = ?', a: '8', choices: ['6', '7', '8', '9'] },
+    ],
+  },
+  'multi-digit-mult': {
+    title: 'Break It Apart', subject: 'math', g: 4,
+    hook: 'Big times problem? Split the big number into tens and ones, multiply each, add them up.',
+    example: '23 × 4 → 20×4 = 80, 3×4 = 12 → 80 + 12 = 92',
+    practice: [
+      { q: '14 × 3 = ?', a: '42', choices: ['32', '42', '43', '17'] },
+      { q: '32 × 5 = ?', a: '160', choices: ['150', '160', '165', '37'] },
+      { q: '26 × 2 = ?', a: '52', choices: ['48', '52', '62', '28'] },
+    ],
+  },
+  'equiv-fractions': {
+    title: 'Same Pizza, More Slices', subject: 'math', g: 4,
+    hook: 'Multiply the top and bottom by the same number and the fraction stays the same size.',
+    example: '1/2 → ×2 top and bottom → 2/4 → ×3 → 3/6. All the same!',
+    practice: [
+      { q: '1/3 is the same as…', a: '2/6', choices: ['2/6', '1/6', '3/3', '2/3'] },
+      { q: '3/4 is the same as…', a: '6/8', choices: ['3/8', '6/8', '4/3', '6/4'] },
+      { q: '4/8 is the same as…', a: '1/2', choices: ['1/4', '1/2', '4/4', '2/8'] },
+    ],
+  },
+  'decimals': {
+    title: 'Decimals = Money', subject: 'math', g: 5,
+    hook: 'Think of decimals like dollars. 0.5 is 50 cents, 0.25 is a quarter.',
+    example: '0.5 + 0.25 → 50¢ + 25¢ = 75¢ → 0.75',
+    practice: [
+      { q: '0.25 + 0.25 = ?', a: '0.5', choices: ['0.05', '0.5', '0.25', '5'] },
+      { q: '1.5 + 0.5 = ?', a: '2', choices: ['1.10', '2', '1.55', '2.5'] },
+      { q: '0.75 − 0.25 = ?', a: '0.5', choices: ['0.5', '0.05', '1', '0.25'] },
+    ],
+  },
+  'fraction-add': {
+    title: 'Adding Fractions', subject: 'math', g: 5,
+    hook: 'Same bottom number? Add the tops, keep the bottom. The bottom is the slice size, and that doesn\'t change.',
+    example: '1/3 + 1/3 → 1 + 1 = 2 → 2/3',
+    practice: [
+      { q: '2/5 + 1/5 = ?', a: '3/5', choices: ['3/10', '3/5', '2/5', '1/5'] },
+      { q: '1/4 + 2/4 = ?', a: '3/4', choices: ['3/8', '3/4', '2/4', '1/2'] },
+      { q: '3/8 + 3/8 = ?', a: '6/8', choices: ['6/16', '6/8', '9/8', '3/8'] },
+    ],
+  },
+  'ratios': {
+    title: 'Ratios & Unit Price', subject: 'math', g: 6,
+    hook: 'Find the price of ONE first. Then multiply for however many you want.',
+    example: '3 apples = $6 → 1 apple = $2 → 5 apples = $10',
+    practice: [
+      { q: '4 tacos cost $8. 6 tacos cost…', a: '$12', choices: ['$10', '$12', '$14', '$16'] },
+      { q: '2 games take 30 min. 5 games take…', a: '75 min', choices: ['60 min', '75 min', '90 min', '50 min'] },
+      { q: 'Ratio of 3 dogs to 6 cats in simplest form?', a: '1:2', choices: ['3:6', '1:2', '2:1', '1:3'] },
+    ],
+  },
+  'negatives': {
+    title: 'Negative Numbers', subject: 'math', g: 6,
+    hook: 'Picture a number line. Negative is below zero, like temperature. Adding moves right, subtracting moves left.',
+    example: '−3 + 5 → start at −3, move 5 right → 2',
+    practice: [
+      { q: '−2 + 6 = ?', a: '4', choices: ['−8', '−4', '4', '8'] },
+      { q: '3 − 5 = ?', a: '−2', choices: ['2', '−2', '8', '−8'] },
+      { q: 'Which is colder?', a: '−10°', choices: ['−10°', '−2°', '0°', '5°'] },
+    ],
+  },
+
+  // ── Reading backfill + grade-level ─────────────────────────────────────
+  'sight-words': {
+    title: 'Sight Word Speed Run', subject: 'reading', g: 1,
+    hook: 'Some words show up everywhere. Know them on sight and reading gets way faster.',
+    example: 'the · said · have · they · were · because',
+    practice: [
+      { q: '"She ___ she was hungry."', a: 'said', choices: ['sed', 'said', 'sayed', 'sedd'] },
+      { q: '"___ went to the park."', a: 'They', choices: ['Thay', 'They', 'Thei', 'Tey'] },
+      { q: '"I stayed home ___ I was sick."', a: 'because', choices: ['becuz', 'because', 'becaus', 'beacause'] },
+    ],
+  },
+  'short-vowels': {
+    title: 'Rhyme Time', subject: 'reading', g: 1,
+    hook: 'Rhyming words end with the same sound. Swap the first letter, keep the ending.',
+    example: 'cat → hat → bat → sat',
+    practice: [
+      { q: 'Rhymes with "dog"?', a: 'log', choices: ['dig', 'log', 'dug', 'dot'] },
+      { q: 'Rhymes with "pin"?', a: 'win', choices: ['pan', 'win', 'pen', 'pit'] },
+      { q: 'Rhymes with "bug"?', a: 'rug', choices: ['bag', 'big', 'rug', 'bun'] },
+    ],
+  },
+  'compound-words': {
+    title: 'Word Mash-Ups', subject: 'reading', g: 2,
+    hook: 'Compound words are two words smashed into one. The meaning usually comes from both parts.',
+    example: 'foot + ball = football   rain + bow = rainbow',
+    practice: [
+      { q: 'Snow + man = ?', a: 'snowman', choices: ['snowman', 'mansnow', 'snowy', 'snowmen'] },
+      { q: 'Which is a compound word?', a: 'backpack', choices: ['backing', 'backpack', 'packed', 'backs'] },
+      { q: 'Base + ball = ?', a: 'baseball', choices: ['ballbase', 'baseball', 'basebal', 'bases'] },
+    ],
+  },
+  'prefixes': {
+    title: 'Prefix Power-Ups', subject: 'reading', g: 3,
+    hook: 'A prefix goes at the start and changes the meaning. un = not, re = again, pre = before.',
+    example: 'un + fair = not fair   re + play = play again',
+    practice: [
+      { q: '"Redo" means…', a: 'do again', choices: ['not do', 'do again', 'do before', 'do badly'] },
+      { q: '"Unlock" means…', a: 'open the lock', choices: ['lock again', 'open the lock', 'lock first', 'big lock'] },
+      { q: '"Preview" means…', a: 'see before', choices: ['see again', 'not see', 'see before', 'see far'] },
+    ],
+  },
+  'synonyms': {
+    title: 'Word Twins', subject: 'reading', g: 4,
+    hook: 'Synonyms mean the same thing. Swap one in and the sentence still makes sense.',
+    example: 'big = huge = enormous   fast = quick = rapid',
+    practice: [
+      { q: 'Synonym for "happy"?', a: 'glad', choices: ['sad', 'glad', 'mad', 'bad'] },
+      { q: 'Synonym for "begin"?', a: 'start', choices: ['end', 'start', 'stop', 'wait'] },
+      { q: 'Synonym for "difficult"?', a: 'hard', choices: ['easy', 'hard', 'fun', 'short'] },
+    ],
+  },
+  'figurative': {
+    title: "Don't Take It Literally", subject: 'reading', g: 5,
+    hook: 'Idioms say one thing but mean another. Ask: what would a person actually mean?',
+    example: '"Break a leg" → good luck   "Piece of cake" → super easy',
+    practice: [
+      { q: '"That test was a piece of cake" means…', a: 'It was easy', choices: ['It was hard', 'It was easy', 'There was cake', 'It was long'] },
+      { q: '"Hit the books" means…', a: 'Study', choices: ['Punch books', 'Study', 'Drop books', 'Read slowly'] },
+      { q: '"I\'m all ears" means…', a: "I'm listening", choices: ['Big ears', "I'm listening", "I'm tired", "I can't hear"] },
+    ],
+  },
+  'theme': {
+    title: "The Story's Lesson", subject: 'reading', g: 5,
+    hook: 'Theme = the life lesson. Ask: what did the character learn, and could it apply to anyone?',
+    example: 'Kid lies, gets caught, loses a friend → Theme: honesty matters.',
+    practice: [
+      { q: 'A kid shares lunch with a new student and they become best friends. Theme?', a: 'Kindness builds friendships', choices: ['Lunch is good', 'Kindness builds friendships', 'School is fun', 'Be new'] },
+      { q: 'A rabbit brags, naps, and loses the race to a turtle. Theme?', a: 'Slow and steady wins', choices: ['Rabbits are fast', 'Slow and steady wins', 'Naps are good', 'Turtles are cool'] },
+      { q: 'A girl is scared to try out, does it anyway, and makes the team. Theme?', a: 'Be brave and try', choices: ['Teams are big', 'Be brave and try', 'Never be scared', 'Tryouts are easy'] },
+    ],
+  },
+  'author-purpose': {
+    title: "Why'd They Write It?", subject: 'reading', g: 6,
+    hook: 'Authors write to Persuade, Inform, or Entertain. Remember it like a PIE.',
+    example: 'Ad = Persuade   Textbook = Inform   Comic = Entertain',
+    practice: [
+      { q: 'A news article about a storm is mostly to…', a: 'Inform', choices: ['Persuade', 'Inform', 'Entertain', 'Sell'] },
+      { q: 'A funny story about a talking dog is mostly to…', a: 'Entertain', choices: ['Persuade', 'Inform', 'Entertain', 'Teach'] },
+      { q: '"Vote for Maya for class president!" is to…', a: 'Persuade', choices: ['Persuade', 'Inform', 'Entertain', 'Explain'] },
+    ],
+  },
+  'evidence': {
+    title: 'Prove It', subject: 'reading', g: 6,
+    hook: 'Evidence is a fact or detail that backs up a claim. It answers: how do you know?',
+    example: 'Claim: "Exercise is healthy." Evidence: "It makes your heart stronger."',
+    practice: [
+      { q: 'Best evidence for "Recess helps students"?', a: 'Kids focus better after playing', choices: ['Recess is fun', 'Kids focus better after playing', 'Swings are red', 'Recess is at noon'] },
+      { q: 'Best evidence for "Reading builds vocabulary"?', a: 'Readers see new words often', choices: ['Books are heavy', 'Readers see new words often', 'Libraries are quiet', 'Books have covers'] },
+      { q: 'Best evidence for "Sleep matters"?', a: 'Sleep helps your brain remember', choices: ['Beds are soft', 'Sleep helps your brain remember', 'Night is dark', 'Pillows are nice'] },
+    ],
+  },
 };
