@@ -17,3 +17,4 @@ Personalized learning app for Atchi (6th grade, CA curriculum, ADHD). Separate f
 - Cache-busting: bump `?v=N` in `index.html` and the imports in `src/app.js` on every deploy, or browsers keep old JS.
 - Audio: `src/audio.js` owns one AudioContext (voice gain up to 3x + compressor, synthesized SFX). Design rules: one accent (coral), cards 28px / choices 20px / buttons pill, no emoji in UI (Phosphor icons).
 - Phone: installable PWA (`manifest.webmanifest`, `sw.js`, `icons/`). Phone layout lives in the `max-width: 600px` block of `style.css`. Pages workflow must copy any new top-level file.
+- History videos: scripts/FAQ/quiz in `src/history.js` (CA HSS 6th grade, Ancient Civilizations), SVG scenes + characters in `src/scene.js`, player/feed in `src/feed.js`. Each beat = one voiceover line (Cloak TTS) + one scene; captions timed to audio duration.

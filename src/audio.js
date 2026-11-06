@@ -42,7 +42,11 @@ export async function playVoice(key, blob, onEnd) {
   src.onended = () => { if (voiceSrc === src) voiceSrc = null; onEnd?.(); };
   src.start();
   voiceSrc = src;
+  return buf.duration;
 }
+// Pause/resume everything (video feed tap-to-pause).
+export function pauseAll() { if (ctx && ctx.state === 'running') ctx.suspend(); }
+export function resumeAll() { if (ctx && ctx.state === 'suspended') ctx.resume(); }
 export const hasVoice = (key) => buffers.has(key);
 export function stopVoice() {
   if (!voiceSrc) return;
@@ -63,7 +67,28 @@ function tone(freq, t0, dur, { type = 'sine', vol = 0.3, to } = {}) {
   o.connect(g).connect(sfxGain);
   o.start(t0); o.stop(t0 + dur + 0.02);
 }
+let noiseBuf;
+function noise(t0, dur, { vol = 0.25, from = 400, to = 3000, q = 0.8 } = {}) {
+  if (!noiseBuf) {
+    noiseBuf = ctx.createBuffer(1, ctx.sampleRate, ctx.sampleRate);
+    const d = noiseBuf.getChannelData(0);
+    for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+  }
+  const src = ctx.createBufferSource(), f = ctx.createBiquadFilter(), g = ctx.createGain();
+  src.buffer = noiseBuf; f.type = 'bandpass'; f.Q.value = q;
+  f.frequency.setValueAtTime(from, t0); f.frequency.exponentialRampToValueAtTime(to, t0 + dur);
+  g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(vol, t0 + dur * 0.4); g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+  src.connect(f).connect(g).connect(sfxGain); src.start(t0); src.stop(t0 + dur + 0.05);
+}
 const SFX = {
+  whoosh: (t) => noise(t, 0.45, { vol: 0.22, from: 300, to: 2400 }),
+  swoosh: (t) => noise(t, 0.3, { vol: 0.18, from: 2600, to: 500 }),
+  boom: (t) => { tone(110, t, 0.6, { vol: 0.45, to: 40 }); noise(t, 0.35, { vol: 0.15, from: 200, to: 80, q: 0.5 }); },
+  chime: (t) => { tone(1568, t, 0.6, { vol: 0.16 }); tone(2093, t + 0.05, 0.7, { vol: 0.1 }); },
+  sparkle: (t) => [1319, 1568, 1976, 2637].forEach((f, i) => tone(f, t + i * 0.05, 0.18, { vol: 0.12 })),
+  drum: (t) => [0, 0.18, 0.36].forEach((d, i) => tone(i === 2 ? 90 : 140, t + d, 0.16, { vol: 0.35, to: 60 })),
+  tick: (t) => tone(1800, t, 0.03, { type: 'square', vol: 0.06 }),
+  like: (t) => { tone(880, t, 0.08, { vol: 0.2, to: 1320 }); tone(1320, t + 0.06, 0.16, { vol: 0.18 }); },
   tap: (t) => tone(620, t, 0.07, { type: 'triangle', vol: 0.18, to: 520 }),
   key: (t) => tone(440, t, 0.06, { type: 'triangle', vol: 0.16 }),
   right: (t) => { tone(784, t, 0.14, { vol: 0.28 }); tone(1175, t + 0.09, 0.22, { vol: 0.24 }); },

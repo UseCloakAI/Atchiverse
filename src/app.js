@@ -1,11 +1,14 @@
-import { ASSESSMENT, LESSONS, PATH } from './content.js?v=7';
-import * as cloud from './cloud.js?v=7';
-import * as voice from './speech.js?v=7';
-import * as jio from './mascot.js?v=7';
-import * as audio from './audio.js?v=7';
-import { hasGen, make } from './gen.js?v=7';
-import { GAMES, play } from './games.js?v=7';
-import { confetti, confettiFrom } from './fx.js?v=7';
+import { ASSESSMENT, LESSONS, PATH } from './content.js?v=8';
+import * as cloud from './cloud.js?v=8';
+import * as voice from './speech.js?v=8';
+import * as jio from './mascot.js?v=8';
+import * as audio from './audio.js?v=8';
+import { hasGen, make } from './gen.js?v=8';
+import { GAMES, play } from './games.js?v=8';
+import { confetti, confettiFrom } from './fx.js?v=8';
+import { VIDEOS } from './history.js?v=8';
+import { scene } from './scene.js?v=8';
+import { openFeed } from './feed.js?v=8';
 
 // ── State ──────────────────────────────────────────────────────────────
 // Each role saves to its own local key so a debug session never touches Atchi's save.
@@ -61,6 +64,7 @@ function say(text, mood, ms) {
   bubble.classList.remove('say'); void bubble.offsetWidth; bubble.classList.add('say');
   if (mood) jio.mood(mood, ms);
 }
+addEventListener('jio:talk', (e) => document.body.classList.toggle('jio-talking', e.detail));
 addEventListener('jio:poke', () => { audio.sfx('pop'); say(pick(LINES.poke), 'cheer', 1000); });
 
 // ── XP levels ──────────────────────────────────────────────────────────
@@ -350,6 +354,14 @@ function runGame(id) {
   });
 }
 
+// ── History videos ─────────────────────────────────────────────────────
+function watch(id) {
+  audio.sfx('tap');
+  voice.stop();
+  say('Swipe up for the next one. Double tap to like.', 'happy', 2200);
+  openFeed({ state, save, addXP, log: (a) => cloud.logAnswer(a), onClose: () => home() }, id);
+}
+
 // ── Home ───────────────────────────────────────────────────────────────
 function home(justAssessed) {
   hud();
@@ -376,6 +388,15 @@ function home(justAssessed) {
   render(`<div class="home-head"><h1>Hey ${esc(who)}.</h1>${role === 'debug' ? '<span class="tag">Debug</span>' : ''}</div>
     <h3>Up next</h3>
     <div class="ups">${nextCard(m, 'math')}${nextCard(r, 'reading')}</div>
+    <h3>Watch: History</h3>
+    <div class="watch">${VIDEOS.map((v, i) => {
+      const b = v.beats.find((x) => x.cast && x.cast.length) || v.beats[1];
+      return `<button class="vid" style="--i:${i}" data-v="${v.id}" aria-label="${esc(v.title)}">
+        <span class="poster">${scene(b.set, b.cast || [], v.hue)}</span>
+        <span class="vid-badges">${state.likes?.[v.id] ? '<i class="ph-fill ph-heart"></i>' : ''}${state.watched?.[v.id] ? '<i class="ph-fill ph-check-circle"></i>' : ''}</span>
+        <i class="ph-fill ph-play-circle play"></i>
+        <span class="vid-t">${esc(v.title)}<small>About 1 min</small></span></button>`;
+    }).join('')}</div>
     <h3>Games</h3>
     <div class="games">${Object.entries(GAMES).map(([id, g], i) => `<button class="game-tile" style="--i:${i}" data-g="${id}">
       <i class="ph-bold ${g.icon}"></i><b>${g.title}</b><small>${state.best[id] ? `Best ${state.best[id]}` : g.blurb}</small></button>`).join('')}</div>
@@ -388,6 +409,7 @@ function home(justAssessed) {
 
   app.querySelectorAll('.up[data-k], .node').forEach((b) => (b.onclick = () => { audio.sfx('tap'); runLesson(b.dataset.k); }));
   app.querySelectorAll('.game-tile').forEach((b) => (b.onclick = () => runGame(b.dataset.g)));
+  app.querySelectorAll('.vid').forEach((b) => (b.onclick = () => watch(b.dataset.v)));
   app.querySelectorAll('.tab').forEach((t) => (t.onclick = () => {
     audio.sfx('tap');
     app.querySelectorAll('.tab').forEach((x) => x.classList.toggle('on', x === t));
@@ -456,7 +478,7 @@ async function dashboard() {
         <div class="level"><i class="ph-bold ph-clock"></i><b>${ago(k.last_active)}</b><span>last active</span></div>
       </div>
       <h3>Needs work</h3>
-      ${weak.length ? `<div class="weak">${weak.map((s) => `<div class="weak-row"><span><b>${esc(LESSONS[s.skill]?.title || s.skill)}</b><small>${s.subject}</small></span>
+      ${weak.length ? `<div class="weak">${weak.map((s) => `<div class="weak-row"><span><b>${esc(LESSONS[s.skill]?.title || VIDEOS.find((v) => `hist-${v.id}` === s.skill)?.title || s.skill)}</b><small>${s.subject}</small></span>
         <span class="weak-n">${s.right}/${s.attempts}</span></div>`).join('')}</div>` : '<p class="lead">Nothing flagged yet.</p>'}
       <h3>Recent answers</h3>
       <div class="recent">${(k.recent || []).slice(0, 15).map((a) => `<div class="ans ${a.correct ? 'ok' : 'no'}">

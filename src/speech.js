@@ -1,5 +1,5 @@
 // TTS via Cloak API, played through the boosted voice channel. Browser voice as fallback.
-import * as audio from './audio.js?v=7';
+import * as audio from './audio.js?v=8';
 
 const API = 'https://api.usecloak.org/v1/speech';
 const PREF = 'atchiverse:autoread';
@@ -50,5 +50,37 @@ export async function say(text) {
     await audio.playVoice(t, blob, () => talk(false));
   } catch {
     if (my === seq) fallback(t);
+  }
+}
+
+// ── Narration for the video feed ──
+// Fetches are de-duplicated so prefetch + play share one request.
+const inflight = new Map();
+export function fetchVoice(text) {
+  const t = clean(text).trim().slice(0, 600);
+  if (blobs.has(t)) return Promise.resolve(blobs.get(t));
+  if (!inflight.has(t)) {
+    inflight.set(t, fetch(API, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ text: t }) })
+      .then((r) => { if (!r.ok) throw new Error(r.status); return r.blob(); })
+      .then((b) => { blobs.set(t, b); return b; })
+      .finally(() => inflight.delete(t)));
+  }
+  return inflight.get(t);
+}
+export const prefetch = (text) => fetchVoice(text).catch(() => {});
+
+// Speak one line. Resolves with its duration in seconds once audio starts,
+// or null if no audio (caller then runs on an estimated timer). onEnd fires when it finishes.
+export async function narrate(text, onEnd) {
+  stop();
+  const my = seq;
+  const t = clean(text).trim().slice(0, 600);
+  try {
+    const blob = await Promise.race([fetchVoice(text), new Promise((_, rej) => setTimeout(() => rej(new Error('slow')), 7000))]);
+    if (my !== seq) return null;
+    talk(true);
+    return await audio.playVoice(t, blob, () => { talk(false); onEnd?.(); });
+  } catch {
+    return null;
   }
 }
