@@ -1,8 +1,8 @@
-import { ASSESSMENT, LESSONS } from './content.js?v=5';
-import * as cloud from './cloud.js?v=5';
-import * as voice from './speech.js?v=5';
-import * as jio from './mascot.js?v=5';
-import * as audio from './audio.js?v=5';
+import { ASSESSMENT, LESSONS } from './content.js?v=6';
+import * as cloud from './cloud.js?v=6';
+import * as voice from './speech.js?v=6';
+import * as jio from './mascot.js?v=6';
+import * as audio from './audio.js?v=6';
 
 const KEY = 'atchiverse:v1';
 const fresh = () => ({ xp: 0, streak: 0, levels: {}, missed: [], done: [] });

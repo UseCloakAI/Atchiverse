@@ -5,7 +5,7 @@ _(repo: Atchiverse)_
 Personalized learning for Atchi — built to work *with* ADHD, not against it. Targets CA 6th grade with backfill from grade 1–2 gaps.
 
 ## Run
-Live: https://usecloakai.github.io/Atchiverse/ — auto-deploys on push to `main` via `.github/workflows/pages.yml`.
+Live: https://usecloakai.github.io/jio/ (after repo rename; old URL until then) — auto-deploys on push to `main` via `.github/workflows/pages.yml`.
 
 Local: Static site, no build. `python3 -m http.server` → open `localhost:8000`.
 
@@ -16,6 +16,7 @@ Local: Static site, no build. `python3 -m http.server` → open `localhost:8000`
 - **PIN login** → progress + every answer synced to Supabase (`answers` table).
 - **Jio the orb** — mascot that reacts (happy, cheer, sad, thinking, talking) and follows the cursor.
 - **Read-aloud** — speaker on every card + auto-read toggle (Cloak TTS, browser voice fallback). Voice boost up to 300%.
+- **Phone app** — installable (Add to Home Screen), offline shell via service worker, thumb-first layout, haptics on Android.
 - **Sound** — synthesized SFX + settings sheet for voice / SFX volume.
 - 27 lessons covering every skill the level check tests.
 

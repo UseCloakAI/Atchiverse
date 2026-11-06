@@ -72,7 +72,10 @@ const SFX = {
   win: (t) => [523, 659, 784, 1047].forEach((f, i) => tone(f, t + i * 0.1, i === 3 ? 0.5 : 0.2, { type: 'triangle', vol: 0.26 })),
   pop: (t) => tone(300, t, 0.12, { vol: 0.25, to: 900 }),
 };
+// Haptics where supported (Android). iOS Safari ignores vibrate; no harm.
+const BUZZ = { key: 8, tap: 8, right: 18, streak: [14, 40, 14], wrong: [40, 50, 40], win: [20, 40, 20, 40, 60] };
 export function sfx(name) {
+  if (BUZZ[name] && navigator.vibrate) { try { navigator.vibrate(BUZZ[name]); } catch {} }
   if (!prefs.sfx || !graph() || !SFX[name]) return;
   SFX[name](ctx.currentTime + 0.01);
 }

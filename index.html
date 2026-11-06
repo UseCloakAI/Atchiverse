@@ -2,14 +2,22 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, interactive-widget=resizes-content" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Jio" />
+  <meta name="format-detection" content="telephone=no" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png" />
   <meta name="theme-color" content="#f2f3f7" media="(prefers-color-scheme: light)" />
   <meta name="theme-color" content="#111016" media="(prefers-color-scheme: dark)" />
   <title>Jio</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource-variable/bricolage-grotesque@5.1.0/index.css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/bold/style.css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/fill/style.css" />
-  <link rel="stylesheet" href="src/style.css?v=5" />
+  <link rel="stylesheet" href="src/style.css?v=6" />
 </head>
 <body>
   <header class="top">
@@ -41,6 +49,7 @@
       <label class="switch"><span><i class="ph-bold ph-speaker-high"></i>Read everything out loud</span><input type="checkbox" id="auto-read" /><span class="track"></span></label>
     </form>
   </dialog>
-  <script type="module" src="src/app.js?v=5"></script>
+  <script type="module" src="src/app.js?v=6"></script>
+  <script>if ('serviceWorker' in navigator) addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));</script>
 </body>
 </html>
