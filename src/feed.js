@@ -1,9 +1,9 @@
 // History feed: vertical, swipeable 1-minute videos built from illustrated scenes,
 // voiceover (Cloak TTS), word-by-word captions, sound effects, likes, and a FAQ sheet.
-import { VIDEOS } from './history.js?v=8';
-import { scene } from './scene.js?v=8';
-import * as voice from './speech.js?v=8';
-import * as audio from './audio.js?v=8';
+import { VIDEOS as ALL } from './history.js?v=9';
+import { scene } from './scene.js?v=9';
+import * as voice from './speech.js?v=9';
+import * as audio from './audio.js?v=9';
 
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const words = (t) => t.trim().split(/\s+/).length;
@@ -17,7 +17,9 @@ class Timer {
 }
 
 // ctx: { state, save, addXP, log, onClose }
-export function openFeed(ctx, startId) {
+// ids: which videos to show (unlocked ones), in path order.
+export function openFeed(ctx, startId, ids) {
+  const VIDEOS = ids ? ids.map((id) => ALL.find((v) => v.id === id)).filter(Boolean) : ALL;
   const muted = { v: false };
   const root = document.createElement('div');
   root.className = 'feed';
@@ -29,7 +31,7 @@ export function openFeed(ctx, startId) {
       <span class="feed-title">History</span>
       <button class="feed-btn" id="f-mute" aria-label="Mute"><i class="ph-bold ph-speaker-high"></i></button>
     </div>
-    <div class="feed-scroll">${VIDEOS.map((v, i) => reelHTML(v, i, ctx.state)).join('')}</div>
+    <div class="feed-scroll">${VIDEOS.map((v, i) => reelHTML(v, i, ctx.state, VIDEOS.length)).join('')}</div>
     <div class="faq" aria-hidden="true"><div class="faq-card"></div></div>`;
   document.body.appendChild(root);
   document.body.classList.add('feed-open');
@@ -132,7 +134,7 @@ export function openFeed(ctx, startId) {
   return close;
 }
 
-function reelHTML(v, i, state) {
+function reelHTML(v, i, state, count) {
   const liked = state.likes?.[v.id];
   return `<section class="reel" data-i="${i}" style="--hue:${v.hue}"><div class="r-frame">
     <div class="r-stage"><div class="r-layers"></div><div class="r-over"></div><div class="r-hearts"></div>
@@ -151,7 +153,7 @@ function reelHTML(v, i, state) {
     <div class="r-end"><div class="end-card">
       <i class="ph-fill ph-check-circle"></i><b>Nice. Video done.</b><span class="end-xp"></span>
       <div class="end-btns"><button class="btn end-faq"><i class="ph-bold ph-question"></i>FAQ + quiz</button>
-      <button class="btn ghost end-replay">Replay</button>${i < VIDEOS.length - 1 ? '<button class="btn ghost end-next">Next video</button>' : ''}</div>
+      <button class="btn ghost end-replay">Replay</button>${i < count - 1 ? '<button class="btn ghost end-next">Next video</button>' : ''}</div>
     </div></div>
   </div></section>`;
 }

@@ -20,6 +20,7 @@ export const VIDEOS = [
       { q: 'Why is it called the Stone Age?', a: 'Because people made most of their tools from stone. The early part is called the Paleolithic, or Old Stone Age.' },
       { q: 'Why was fire such a big deal?', a: 'Fire gave warmth, light, protection from animals, and let people cook food, which made it safer and easier to eat.' },
     ],
+    quiz: [{ q: "Early humans first lived in...", a: "Africa", choices: ["Africa", "Europe", "Australia", "North America"] }, { q: "Why was this time called the Stone Age?", a: "Tools were made of stone", choices: ["People lived in stone houses", "Tools were made of stone", "It was very cold", "People ate stones"] }],
     check: { q: 'Hunter-gatherers moved around mostly to...', a: 'Follow food sources', choices: ['Follow food sources', 'Visit other cities', 'Find gold', 'Go to school'] },
   },
   {
@@ -40,6 +41,7 @@ export const VIDEOS = [
       { q: 'What is a surplus?', a: 'More of something than you need. A food surplus let some people do jobs other than farming.' },
       { q: 'How did farming lead to cities?', a: 'Farmers settled in one place, food surpluses let populations grow, and villages grew into towns and then cities.' },
     ],
+    quiz: [{ q: "Taming plants and animals is called...", a: "Domestication", choices: ["Irrigation", "Domestication", "Migration", "Democracy"] }, { q: "Once people farmed, they began to...", a: "Live in permanent villages", choices: ["Move every week", "Live in permanent villages", "Stop eating meat", "Build pyramids"] }],
     check: { q: 'Extra food that is more than people need is called a...', a: 'Surplus', choices: ['Nomad', 'Surplus', 'Dynasty', 'Tribute'] },
   },
   {
@@ -60,6 +62,7 @@ export const VIDEOS = [
       { q: 'What is a city-state?', a: 'A city that governs itself and the land around it, like its own small country. Ur and Uruk were Sumerian city-states.' },
       { q: 'What is a ziggurat?', a: 'A huge stepped temple at the center of a Sumerian city, built to honor the city\'s god.' },
     ],
+    quiz: [{ q: "Digging canals to bring water to crops is called...", a: "Irrigation", choices: ["Irrigation", "Domestication", "Cuneiform", "Surplus"] }, { q: "A giant stepped temple in Sumer was a...", a: "Ziggurat", choices: ["Pyramid", "Ziggurat", "Stupa", "Colosseum"] }],
     check: { q: 'Mesopotamia was between which two rivers?', a: 'Tigris and Euphrates', choices: ['Nile and Kush', 'Tigris and Euphrates', 'Indus and Ganges', 'Huang He and Yangtze'] },
   },
   {
@@ -80,6 +83,7 @@ export const VIDEOS = [
       { q: "What was Hammurabi's Code?", a: 'A set of 282 laws written by King Hammurabi of Babylon around 1754 BCE and carved on a stone for all to see.' },
       { q: 'Why did written laws matter?', a: 'Everyone could know the rules, and the rules stayed the same. That is a big step toward fair, organized government.' },
     ],
+    quiz: [{ q: "Hammurabi carved his laws on stone so that...", a: "Everyone could see them", choices: ["Nobody could read them", "Everyone could see them", "They would float", "Kings could hide them"] }, { q: "Hammurabi was a king of...", a: "Babylon", choices: ["Babylon", "Egypt", "Athens", "China"] }],
     check: { q: 'Cuneiform was written on...', a: 'Clay tablets', choices: ['Paper', 'Clay tablets', 'Silk', 'Papyrus'] },
   },
   {
@@ -100,6 +104,7 @@ export const VIDEOS = [
       { q: 'What were pyramids for?', a: 'Tombs for pharaohs, built to protect their bodies and treasures for the afterlife.' },
       { q: 'What are hieroglyphics?', a: 'Egyptian writing that used picture symbols. Scribes wrote on papyrus, a paper made from a river plant.' },
     ],
+    quiz: [{ q: "Egyptian rulers were called...", a: "Pharaohs", choices: ["Emperors", "Pharaohs", "Consuls", "Kandakes"] }, { q: "Pyramids were built as...", a: "Tombs for pharaohs", choices: ["Schools", "Tombs for pharaohs", "Markets", "Forts"] }],
     check: { q: 'The Nile flood was important because it...', a: 'Left rich soil for farming', choices: ['Destroyed the pyramids', 'Left rich soil for farming', 'Made the desert bigger', 'Froze the river'] },
   },
   {
@@ -120,6 +125,7 @@ export const VIDEOS = [
       { q: 'Did Kush ever rule Egypt?', a: 'Yes. Around 750 BCE Kush conquered Egypt, and Kushite kings ruled as pharaohs for about a century.' },
       { q: 'What was Meroë known for?', a: 'Meroë was a Kushite capital and a major center for making iron.' },
     ],
+    quiz: [{ q: "Kush became famous for making...", a: "Iron", choices: ["Paper", "Iron", "Silk", "Glass"] }, { q: "Around 750 BCE, Kush...", a: "Conquered Egypt", choices: ["Conquered Egypt", "Invented writing", "Built the Great Wall", "Became a democracy"] }],
     check: { q: 'Kush was located...', a: 'South of Egypt', choices: ['North of Greece', 'South of Egypt', 'East of China', 'In Mesopotamia'] },
   },
   {
@@ -140,6 +146,7 @@ export const VIDEOS = [
       { q: 'What was the caste system?', a: 'A strict social structure in ancient India that decided people\'s jobs and limited who they could marry.' },
       { q: 'Who was the Buddha?', a: 'Siddhartha Gautama, a prince who gave up his wealth to understand suffering. His teachings became Buddhism.' },
     ],
+    quiz: [{ q: "Siddhartha Gautama became known as...", a: "The Buddha", choices: ["The Buddha", "A pharaoh", "Confucius", "An emperor"] }, { q: "The Hindu idea that your actions have results is...", a: "Karma", choices: ["Karma", "Caste", "Mandate", "Surplus"] }],
     check: { q: 'The first civilization in India grew along the...', a: 'Indus River', choices: ['Nile River', 'Indus River', 'Tigris River', 'Yellow River'] },
   },
   {
@@ -160,6 +167,7 @@ export const VIDEOS = [
       { q: 'What did Confucius teach?', a: 'Respect for family and elders, honesty, and that leaders should be good role models.' },
       { q: 'What was the Silk Road?', a: 'A network of trade routes connecting China to the Middle East and Rome. Silk, spices, and ideas traveled along it.' },
     ],
+    quiz: [{ q: "The Mandate of Heaven was the idea that...", a: "Heaven approved the ruler", choices: ["Heaven approved the ruler", "Everyone could vote", "Rivers were gods", "Farming was wrong"] }, { q: "The Silk Road was a...", a: "Trade route", choices: ["Trade route", "Wall", "River", "Temple"] }],
     check: { q: 'The first emperor of a united China was...', a: 'Qin Shi Huang', choices: ['Confucius', 'Qin Shi Huang', 'Hammurabi', 'Julius Caesar'] },
   },
   {
@@ -180,6 +188,7 @@ export const VIDEOS = [
       { q: 'How was Sparta different from Athens?', a: 'Sparta focused on military strength and discipline. Athens focused on democracy, art, and learning.' },
       { q: 'Who was Alexander the Great?', a: 'A Macedonian king who built a huge empire and spread Greek culture from Greece to Egypt and India.' },
     ],
+    quiz: [{ q: "Greece formed city-states because of...", a: "Mountains and sea", choices: ["Mountains and sea", "A big desert", "One great river", "Ice"] }, { q: "In Athens, who could vote?", a: "Free men born in Athens", choices: ["Everyone", "Free men born in Athens", "Only the king", "Women only"] }],
     check: { q: 'Which city-state created the first democracy?', a: 'Athens', choices: ['Sparta', 'Athens', 'Rome', 'Babylon'] },
   },
   {
@@ -200,6 +209,16 @@ export const VIDEOS = [
       { q: 'Who was Augustus?', a: 'Julius Caesar\'s heir and Rome\'s first emperor, starting in 27 BCE. His rule began a long peace called the Pax Romana.' },
       { q: 'What did Romans leave behind?', a: 'Roads, arches, aqueducts, the Latin language, ideas about law and government, and the spread of Christianity.' },
     ],
+    quiz: [{ q: "Rome's first emperor was...", a: "Augustus", choices: ["Julius Caesar", "Augustus", "Romulus", "Hammurabi"] }, { q: "Aqueducts were built to...", a: "Carry water to cities", choices: ["Carry water to cities", "Store grain", "Hold races", "Bury emperors"] }],
     check: { q: 'In a republic, citizens...', a: 'Elect leaders to represent them', choices: ['Obey a pharaoh', 'Elect leaders to represent them', 'Have no rights', 'Follow the Mandate of Heaven'] },
   },
+];
+
+// History path: two videos per unit, then a unit test.
+export const HIST_PATH = [
+  { unit: 'First people', videos: ['early-humans', 'farming'] },
+  { unit: 'Mesopotamia', videos: ['mesopotamia', 'writing-laws'] },
+  { unit: 'Egypt and Kush', videos: ['egypt', 'kush'] },
+  { unit: 'India and China', videos: ['india', 'china'] },
+  { unit: 'Greece and Rome', videos: ['greece', 'rome'] },
 ];

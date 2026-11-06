@@ -1,5 +1,5 @@
 // TTS via Cloak API, played through the boosted voice channel. Browser voice as fallback.
-import * as audio from './audio.js?v=8';
+import * as audio from './audio.js?v=9';
 
 const API = 'https://api.usecloak.org/v1/speech';
 const PREF = 'atchiverse:autoread';

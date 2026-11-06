@@ -783,3 +783,72 @@ body.jio-talking .reel .mini-jio { animation: talk .26s ease-in-out infinite alt
 @keyframes ink { to { opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .r-cap span { opacity: 1; } .a-write { opacity: 1; } .a-draw { stroke-dashoffset: 0; } }
 @media (min-width: 700px) { .feed-top { left: 50%; right: auto; width: calc(min(100dvh, 860px) * 9 / 16); transform: translateX(-50%); top: max(0px, calc((100dvh - 860px) / 2)); } }
+
+/* ── Path home ─────────────────────────────────────────── */
+.home-head { justify-content: space-between; flex-wrap: wrap; }
+.home-head h1 { margin-right: auto; }
+.arcade-btn {
+  display: inline-flex; align-items: center; gap: 8px; height: 44px; padding: 0 16px; border-radius: 999px; border: 0; cursor: pointer;
+  background: var(--ink); color: var(--surface); font-weight: 750; transition: transform .2s var(--spring);
+}
+.arcade-btn i { font-size: 1.25rem; color: var(--accent); }
+.arcade-btn:active { transform: scale(.95); }
+.back { display: inline-flex; align-items: center; gap: 4px; margin: -6px 0 12px -6px; padding: 6px 10px 6px 6px; border-radius: 999px; border: 0; background: none; color: var(--muted); font-weight: 700; cursor: pointer; }
+.back:hover { background: var(--surface-2); }
+
+.subj { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin-top: 20px; padding: 5px; border-radius: 24px; background: var(--surface-2); }
+.subj-b { display: grid; justify-items: center; gap: 2px; padding: 10px 6px; border-radius: 20px; border: 0; background: none; cursor: pointer; color: var(--muted); font-weight: 750; transition: background .2s, color .2s, transform .2s var(--spring); }
+.subj-b i { font-size: 1.35rem; }
+.subj-b small { font-size: .75rem; font-weight: 700; opacity: .8; }
+.subj-b.on { background: var(--surface); color: var(--ink); box-shadow: 0 2px 10px rgb(0 0 0 / .08); }
+.subj-b.on i { color: var(--accent); }
+.subj-b:active { transform: scale(.96); }
+
+.path { --k: 1; margin-top: 18px; display: grid; gap: 26px; }
+@media (max-width: 600px) { .path { --k: .72; } }
+.punit { display: grid; gap: 6px; animation: enter .5s var(--ease) both; }
+.pbanner { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 14px 18px; border-radius: 20px; background: var(--accent); color: var(--on-accent); }
+.pbanner small { display: block; font-weight: 750; font-size: .8rem; opacity: .75; }
+.pbanner b { font-size: 1.15rem; }
+.pcount { font-weight: 800; font-size: 1rem; }
+.punit.locked .pbanner { background: var(--surface-2); color: var(--muted); }
+.punit.locked .pbanner i { font-size: 1.3rem; }
+.pnodes { display: grid; justify-items: center; gap: 8px; padding: 14px 0 4px; }
+.pnode-wrap { position: relative; display: grid; justify-items: center; gap: 4px; transform: translateX(calc(var(--x) * var(--k) * 1px)); }
+.pnode {
+  width: 72px; height: 72px; border-radius: 999px; border: 0; cursor: pointer; display: grid; place-items: center; font-size: 1.9rem;
+  background: var(--surface-2); color: var(--muted); box-shadow: inset 0 -6px 0 rgb(0 0 0 / .08);
+  transition: transform .2s var(--spring);
+}
+.pnode:active { transform: translateY(3px) scale(.96); box-shadow: inset 0 -2px 0 rgb(0 0 0 / .08); }
+.pnode.done { background: var(--accent); color: var(--on-accent); box-shadow: inset 0 -6px 0 rgb(0 0 0 / .16); }
+.pnode.cur { width: 84px; height: 84px; font-size: 2.2rem; background: var(--accent); color: var(--on-accent); box-shadow: inset 0 -7px 0 rgb(0 0 0 / .16), 0 0 0 7px var(--accent-soft); animation: cur-bob 1.6s ease-in-out infinite; }
+.pnode.locked { opacity: .55; cursor: not-allowed; }
+.pnode.t-test { border-radius: 26px; }
+.pnode.t-test.done, .pnode.t-test.cur { background: #f5b700; color: #3a2600; }
+.pnode.t-review.done, .pnode.t-review.cur { background: var(--ink); color: var(--surface); }
+.pnode.nope { animation: shake .38s var(--ease); }
+@keyframes cur-bob { 50% { transform: translateY(-5px); } }
+.pstart {
+  position: absolute; top: -34px; z-index: 1; padding: 5px 12px; border-radius: 999px; white-space: nowrap;
+  background: var(--ink); color: var(--surface); font-weight: 800; font-size: .85rem; animation: cur-bob 1.6s ease-in-out infinite;
+}
+.pstart::after { content: ""; position: absolute; left: 50%; bottom: -5px; width: 10px; height: 10px; background: var(--ink); transform: translateX(-50%) rotate(45deg); border-radius: 2px; }
+.pnode-wrap:has(.pstart) { margin-top: 30px; }
+.plabel { max-width: 150px; text-align: center; font-weight: 700; font-size: .88rem; line-height: 1.2; color: var(--ink); }
+.pnode.locked + .plabel { color: var(--muted); }
+.pstars { color: var(--accent); font-size: .8rem; line-height: 1; }
+.pstars i.ph-bold { color: var(--line); }
+.pdone { display: grid; justify-items: center; gap: 6px; padding: 18px; border-radius: 20px; background: #fff3c4; color: #6b4a00; }
+.pdone i { font-size: 2.4rem; color: #f5b700; }
+
+.check-hero { width: 84px; height: 84px; border-radius: 26px; display: grid; place-items: center; font-size: 2.6rem; margin-bottom: 16px; background: var(--ink); color: var(--surface); animation: say .5s var(--spring); }
+.check-hero.test { background: #f5b700; color: #3a2600; }
+.check-hero.win { animation: hop .7s var(--spring); }
+.unlock { display: inline-flex; align-items: center; gap: 8px; margin-top: 14px; padding: 8px 14px; border-radius: 999px; background: var(--good-soft); color: var(--good); font-weight: 750; animation: say .5s var(--spring) .3s both; }
+.unlock.big { font-size: 1.05rem; padding: 10px 16px; }
+.practice { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 16px; padding: 14px; border-radius: 20px; background: var(--surface-2); }
+.practice span { padding: 4px 10px; border-radius: 999px; background: var(--surface); font-weight: 650; font-size: .9rem; }
+.where { font-weight: 750; color: var(--accent); text-align: right; }
+.games.arcade { margin-top: 20px; }
+@media (max-width: 600px) { .games.arcade { grid-template-columns: 1fr; } .games.arcade .game-tile { min-height: 0; grid-template-columns: auto 1fr; } .games.arcade small { display: block; } }

@@ -1,14 +1,15 @@
-import { ASSESSMENT, LESSONS, PATH } from './content.js?v=8';
-import * as cloud from './cloud.js?v=8';
-import * as voice from './speech.js?v=8';
-import * as jio from './mascot.js?v=8';
-import * as audio from './audio.js?v=8';
-import { hasGen, make } from './gen.js?v=8';
-import { GAMES, play } from './games.js?v=8';
-import { confetti, confettiFrom } from './fx.js?v=8';
-import { VIDEOS } from './history.js?v=8';
-import { scene } from './scene.js?v=8';
-import { openFeed } from './feed.js?v=8';
+import { ASSESSMENT, LESSONS, PATH } from './content.js?v=9';
+import * as cloud from './cloud.js?v=9';
+import * as voice from './speech.js?v=9';
+import * as jio from './mascot.js?v=9';
+import * as audio from './audio.js?v=9';
+import { hasGen, make } from './gen.js?v=9';
+import { GAMES, play } from './games.js?v=9';
+import { confetti, confettiFrom } from './fx.js?v=9';
+import { VIDEOS } from './history.js?v=9';
+import { scene } from './scene.js?v=9';
+import { openFeed } from './feed.js?v=9';
+import { SUBJECTS, PASS, units, walk, progress, questions } from './path.js?v=9';
 
 // ── State ──────────────────────────────────────────────────────────────
 // Each role saves to its own local key so a debug session never touches Atchi's save.
@@ -42,7 +43,7 @@ const bubble = $('#bubble');
 const shuffle = (a) => [...a].sort(() => Math.random() - 0.5);
 const pick = (a) => a[Math.floor(Math.random() * a.length)];
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-const icon = (subject) => (subject === 'math' ? 'ph-calculator' : 'ph-book-open-text');
+const icon = (subject) => ({ math: 'ph-calculator', reading: 'ph-book-open-text', history: 'ph-scroll' }[subject] || 'ph-book-open-text');
 const QS_PER_SUBJECT = 6;
 const BREAK_MS = 8 * 60 * 1000;
 let sessionStart = Date.now();
@@ -253,18 +254,25 @@ function startAssessment() {
 
 // ── Path ───────────────────────────────────────────────────────────────
 const passed = (k) => (state.mastery[k] || 0) >= 1;
-const nextIn = (subject) => {
-  for (const u of PATH[subject]) for (const k of u.skills) if (!passed(k)) return { k, unit: u.unit };
-  return null;
-};
+const curSubject = () => state.ui?.subject || 'math';
 // Fact skills he has reached so far feed Fact Sprint.
 const FACTS = ['make-10', 'doubles', 'add-20', 'sub-20', 'fact-families', 'mult-easy', 'mult-mid', 'mult-hard', 'div-facts'];
 function mathPool() {
-  const order = PATH.math.flatMap((u) => u.skills).filter((k) => FACTS.includes(k));
-  const cur = nextIn('math')?.k;
-  const idx = Math.max(order.indexOf(cur), 0);
-  const reached = order.slice(0, idx + 1);
-  return reached.length >= 2 ? reached : order.slice(0, 3);
+  const cur = walk('math', state).current;
+  const reached = FACTS.filter((k) => passed(k) || cur?.key === k);
+  return reached.length >= 2 ? reached : FACTS.slice(0, 3);
+}
+const NODE_ICON = { video: 'ph-play', review: 'ph-arrows-clockwise', test: 'ph-trophy' };
+const nodeIcon = (n, subject) => (!n.open ? 'ph-lock' : n.done && n.type === 'lesson' ? 'ph-check' : NODE_ICON[n.type] || SUBJECTS[subject].icon);
+
+function openNode(subject, n) {
+  if (n.type === 'lesson') return runLesson(n.key);
+  if (n.type === 'video') return watch(n.id);
+  return runCheck(subject, n);
+}
+function goNext(subject) {
+  const { current } = walk(subject, state);
+  return current ? openNode(subject, current) : home();
 }
 
 // ── Lessons ────────────────────────────────────────────────────────────
@@ -276,12 +284,14 @@ function runLesson(key) {
   const need = gen ? 4 : Math.ceil(total * 0.66);
   const read = `${L.title}. ${L.hook} For example: ${L.example}`;
   say(pick(['New one. You got this.', 'Read this part, then we practice.', `Quick lesson, then ${total} questions.`]), 'happy', 1400);
-  render(`<p class="label"><i class="ph-bold ${icon(L.subject)}"></i>Lesson</p>
+  render(`<button class="back" id="back"><i class="ph-bold ph-caret-left"></i>Path</button>
+    <p class="label"><i class="ph-bold ${icon(L.subject)}"></i>Lesson</p>
     <div class="qrow"><h1>${esc(L.title)}</h1>${spk(read)}</div>
     <p class="lead">${esc(L.hook)}</p>
     <div class="example">${esc(L.example)}</div>
     <p class="muted-sm">${total} questions. Get ${need} right to clear it.</p>
     <button class="btn" id="go">Let's practice <i class="ph-bold ph-arrow-right"></i></button>`, read);
+  $('#back').onclick = () => { audio.sfx('tap'); home(); };
   $('#go').onclick = () => {
     audio.sfx('tap');
     let i = 0, right = 0;
@@ -294,33 +304,105 @@ function runLesson(key) {
     const result = () => {
       const pass = right >= need;
       const stars = !pass ? 0 : right === total ? 3 : right >= need + 1 || total <= 3 ? 2 : 1;
-      const prev = state.mastery[key] || 0;
-      if (stars > prev) state.mastery[key] = stars;
+      if (stars > (state.mastery[key] || 0)) state.mastery[key] = stars;
       if (pass && !state.done.includes(key)) state.done.push(key);
       save();
       say(pass ? (stars === 3 ? 'Perfect run!' : 'Cleared it!') : `${right} of ${total}. One more try?`, pass ? 'cheer' : 'sad', 2000);
-      const nxt = nextIn(L.subject);
+      const nxt = walk(L.subject, state).current;
       render(`<p class="label"><i class="ph-bold ${icon(L.subject)}"></i>${esc(L.title)}</p>
         <h1>${pass ? (stars === 3 ? 'Perfect.' : 'Lesson cleared.') : 'So close.'}</h1>
         <p class="lead">${right} of ${total} right${pass ? '' : `. Need ${need}.`}</p>
         <div class="stars big-stars" aria-label="${stars} of 3 stars">${Array.from({ length: 3 }, (_, j) =>
           `<i class="${j < stars ? 'ph-fill' : 'ph-bold'} ph-star" style="--i:${j}"></i>`).join('')}</div>
+        ${pass && nxt && nxt.type !== 'lesson' ? `<p class="unlock"><i class="ph-fill ph-lock-open"></i>${nxt.type === 'review' ? 'Unit review unlocked' : 'Unit test unlocked'}</p>` : ''}
         <div class="btn-row">
-          ${pass && nxt ? `<button class="btn" id="next">Next: ${esc(LESSONS[nxt.k].title)}</button>` : ''}
+          ${pass && nxt ? `<button class="btn" id="next">Next: ${esc(nxt.title)}</button>` : ''}
           ${pass ? '' : '<button class="btn" id="retry">Try again</button>'}
-          <button class="btn ghost" id="home">Home</button>
+          <button class="btn ghost" id="home">Back to path</button>
         </div>`, pass ? 'Lesson cleared!' : 'So close. Want to try again?');
-      if (pass) {
-        addXP(20 + stars * 10, $('.stars'));
-        audio.sfx('win');
-        confettiFrom($('.stars'), stars === 3 ? 140 : 80);
-      }
+      if (pass) { addXP(20 + stars * 10, $('.stars')); audio.sfx('win'); confettiFrom($('.stars'), stars === 3 ? 140 : 80); }
       $('#home').onclick = () => { audio.sfx('tap'); home(); };
       $('#retry') && ($('#retry').onclick = () => { audio.sfx('tap'); runLesson(key); });
-      $('#next') && ($('#next').onclick = () => { audio.sfx('tap'); runLesson(nxt.k); });
+      $('#next') && ($('#next').onclick = () => { audio.sfx('tap'); goNext(L.subject); });
     };
     next();
   };
+}
+
+// ── Reviews and unit tests ─────────────────────────────────────────────
+// Review: mixed practice with hints, pass 70%. Test: no hints, pass 80%, unlocks the next unit.
+function runCheck(subject, node) {
+  const kind = node.type;
+  const us = units(subject);
+  const u = us[node.unit];
+  const qs = questions(subject, node.unit, kind);
+  const total = qs.length;
+  const need = Math.ceil(total * PASS[kind]);
+  const nextUnit = us[node.unit + 1];
+  const isTest = kind === 'test';
+  const intro = isTest
+    ? `Unit test. ${total} questions, no hints. Get ${need} right to unlock ${nextUnit ? nextUnit.name : 'the finish'}.`
+    : `Review time. ${total} mixed questions from ${u.name}. Get ${need} right to unlock the unit test.`;
+  say(isTest ? 'Test time. You got this.' : 'Quick review. Hints are on.', 'happy', 1600);
+  render(`<button class="back" id="back"><i class="ph-bold ph-caret-left"></i>Path</button>
+    <div class="check-hero ${kind}"><i class="ph-fill ${isTest ? 'ph-trophy' : 'ph-arrows-clockwise'}"></i></div>
+    <p class="label"><i class="ph-bold ${icon(subject)}"></i>Unit ${node.unit + 1}: ${esc(u.name)}</p>
+    <div class="qrow"><h1>${isTest ? 'Unit test' : 'Unit review'}</h1>${spk(intro)}</div>
+    <p class="lead">${esc(intro)}</p>
+    <button class="btn" id="go">${isTest ? 'Start test' : 'Start review'} <i class="ph-bold ph-arrow-right"></i></button>`, intro);
+  $('#back').onclick = () => { audio.sfx('tap'); home(); };
+  $('#go').onclick = () => {
+    audio.sfx('tap');
+    let i = 0, right = 0;
+    const missed = new Set();
+    const next = () => {
+      if (i >= total) return result();
+      const item = qs[i++];
+      const shown = isTest ? { ...item, hint: undefined } : item;
+      ask(shown, { label: isTest ? 'Unit test' : 'Review', n: i, total, meta: { kind, subject, skill: item.skill, grade: item.grade || 6 } },
+        (ok) => { if (ok) right++; else missed.add(item.skill); next(); });
+    };
+    const result = () => {
+      const pass = right >= need;
+      const stars = !pass ? 0 : right === total ? 3 : right >= need + 1 ? 2 : 1;
+      if (stars > (state.mastery[node.id] || 0)) state.mastery[node.id] = stars;
+      save();
+      const unlocked = pass && isTest && nextUnit;
+      const missedNames = [...missed].map((k) => LESSONS[k]?.title || VIDEOS.find((v) => `hist-${v.id}` === k)?.title).filter(Boolean);
+      say(pass ? (unlocked ? `Unit ${node.unit + 2} unlocked!` : 'Passed!') : 'Not yet. Check what to practice.', pass ? 'cheer' : 'sad', 2400);
+      render(`<div class="check-hero ${kind} ${pass ? 'win' : ''}"><i class="ph-fill ${pass ? (isTest ? 'ph-trophy' : 'ph-check-circle') : 'ph-arrow-counter-clockwise'}"></i></div>
+        <h1>${pass ? (isTest ? 'Unit passed!' : 'Review passed.') : 'Not yet.'}</h1>
+        <p class="lead">${right} of ${total} right${pass ? '' : `. You need ${need}.`}</p>
+        <div class="stars big-stars">${Array.from({ length: 3 }, (_, j) => `<i class="${j < stars ? 'ph-fill' : 'ph-bold'} ph-star" style="--i:${j}"></i>`).join('')}</div>
+        ${unlocked ? `<p class="unlock big"><i class="ph-fill ph-lock-open"></i>Unit ${node.unit + 2}: ${esc(nextUnit.name)} unlocked</p>` : ''}
+        ${!pass && missedNames.length ? `<div class="practice"><b>Practice these:</b>${missedNames.map((t) => `<span>${esc(t)}</span>`).join('')}</div>` : ''}
+        <div class="btn-row">
+          ${pass ? '<button class="btn" id="next">Keep going</button>' : '<button class="btn" id="retry">Try again</button>'}
+          <button class="btn ghost" id="home">Back to path</button>
+        </div>`, pass ? 'Passed!' : 'Not yet.');
+      if (pass) {
+        addXP(isTest ? 60 + stars * 20 : 30 + stars * 10, $('.stars'));
+        audio.sfx('win');
+        confettiFrom($('.check-hero'), unlocked ? 220 : 100);
+        if (unlocked) setTimeout(() => confetti({ count: 160 }), 500);
+      } else audio.sfx('wrong');
+      $('#home').onclick = () => { audio.sfx('tap'); home(); };
+      $('#retry') && ($('#retry').onclick = () => { audio.sfx('tap'); runCheck(subject, node); });
+      $('#next') && ($('#next').onclick = () => { audio.sfx('tap'); goNext(subject); });
+    };
+    next();
+  };
+}
+
+// ── Arcade (games live here, off the main path) ────────────────────────
+function arcade() {
+  say('Arcade! Pick a game.', 'cheer', 1400);
+  render(`<button class="back" id="back"><i class="ph-bold ph-caret-left"></i>Path</button>
+    <h1>Arcade</h1><p class="lead">Quick games that train your skills. Beat your best.</p>
+    <div class="games arcade">${Object.entries(GAMES).map(([id, g], i) => `<button class="game-tile" style="--i:${i}" data-g="${id}">
+      <i class="ph-bold ${g.icon}"></i><b>${g.title}</b><small>${state.best[id] ? `Best ${state.best[id]}` : g.blurb}</small></button>`).join('')}</div>`);
+  $('#back').onclick = () => { audio.sfx('tap'); home(); };
+  app.querySelectorAll('.game-tile').forEach((b) => (b.onclick = () => runGame(b.dataset.g)));
 }
 
 // ── Games ──────────────────────────────────────────────────────────────
@@ -330,7 +412,7 @@ function runGame(id) {
   play(id, {
     app, say, sfx: audio.sfx, mathPool,
     onEnd: (score, title) => {
-      if (score === null) return home();
+      if (score === null) return arcade();
       const best = state.best[id] || 0;
       const record = score > best;
       if (record) state.best[id] = score;
@@ -343,82 +425,76 @@ function runGame(id) {
         <p class="lead">Best: ${Math.max(score, best)}</p>
         <div class="btn-row">
           <button class="btn" id="again">Play again</button>
-          <button class="btn ghost" id="home">Home</button>
+          <button class="btn ghost" id="home">Arcade</button>
         </div>`, `${score} points!`);
       if (xp) addXP(xp, $('#final'));
       audio.sfx(record ? 'win' : 'streak');
       if (record) confettiFrom($('#final'), 140);
       $('#again').onclick = () => runGame(id);
-      $('#home').onclick = () => { audio.sfx('tap'); home(); };
+      $('#home').onclick = () => { audio.sfx('tap'); arcade(); };
     },
   });
 }
 
 // ── History videos ─────────────────────────────────────────────────────
+// Only unlocked videos are in the feed, in path order.
 function watch(id) {
   audio.sfx('tap');
   voice.stop();
-  say('Swipe up for the next one. Double tap to like.', 'happy', 2200);
-  openFeed({ state, save, addXP, log: (a) => cloud.logAnswer(a), onClose: () => home() }, id);
+  const ids = walk('history', state).units.flatMap((u) => u.nodes).filter((n) => n.type === 'video' && n.open).map((n) => n.id);
+  say('Watch to the end to unlock the next one.', 'happy', 2200);
+  openFeed({ state, save, addXP, log: (a) => cloud.logAnswer(a), onClose: () => home() }, id, ids);
 }
 
-// ── Home ───────────────────────────────────────────────────────────────
+// ── Home: one path at a time ───────────────────────────────────────────
+const OFFS = [0, 56, 84, 56, 0, -56, -84, -56];
 function home(justAssessed) {
   hud();
   if (role === 'parent') return dashboard();
   if (role === 'student' && !state.levels.math && !Object.keys(state.mastery).length) return startAssessment();
-  const m = nextIn('math'), r = nextIn('reading');
-  const allSkills = [...PATH.math, ...PATH.reading].flatMap((u) => u.skills);
-  const cleared = allSkills.filter(passed).length;
-  say(justAssessed ? 'Done! Your path is ready.' : pick([`Welcome back, ${who}.`, 'Ready when you are.', "Let's knock one out.", 'Tap me if you get bored.']), 'happy', 1600);
+  const subject = curSubject();
+  const { units: us, current } = walk(subject, state);
+  say(justAssessed ? 'Done! Your path is ready.' : current ? pick([`Next up: ${current.title}.`, `Let's do ${current.title}.`, 'Tap the glowing one.']) : 'You finished this whole path!', 'happy', 1800);
 
-  const nextCard = (n, subject) => n ? `<button class="up" data-k="${n.k}">
-      <span class="up-ico"><i class="ph-bold ${icon(subject)}"></i></span>
-      <span class="up-txt"><small>${subject === 'math' ? 'Math' : 'Reading'} · ${esc(n.unit)}</small><b>${esc(LESSONS[n.k].title)}</b></span>
-      <i class="ph-bold ph-play-circle up-go"></i></button>`
-    : `<div class="up done-all"><i class="ph-fill ph-trophy"></i><b>${subject === 'math' ? 'Math' : 'Reading'} path complete</b></div>`;
+  const nodeHTML = (n, j) => `<div class="pnode-wrap" style="--x:${OFFS[j % OFFS.length]}">
+      ${n.current ? `<span class="pstart">${n.type === 'test' ? 'Unit test' : n.type === 'review' ? 'Review' : n.type === 'video' ? 'Watch' : 'Start'}</span>` : ''}
+      <button class="pnode t-${n.type}${n.done ? ' done' : ''}${n.current ? ' cur' : ''}${n.open ? '' : ' locked'}" data-id="${n.id}" aria-label="${esc(n.title)}${n.open ? '' : ' (locked)'}">
+        <i class="ph-${(n.done || n.current) && !(n.done && n.type === 'lesson') ? 'fill' : 'bold'} ${nodeIcon(n, subject)}"></i></button>
+      <span class="plabel">${esc(n.title)}</span>
+      ${n.done ? `<span class="pstars">${starRow(n.stars)}</span>` : ''}
+    </div>`;
 
-  const map = (subject) => PATH[subject].map((u) => `<div class="unit"><p class="unit-name">${esc(u.unit)}</p><div class="nodes">${
-    u.skills.map((k) => {
-      const st = state.mastery[k] || 0, cur = (subject === 'math' ? m : r)?.k === k;
-      return `<button class="node ${st ? 'got' : ''} ${cur ? 'cur' : ''}" data-k="${k}" title="${esc(LESSONS[k].title)}">
-        <span class="node-t">${esc(LESSONS[k].title)}</span><span class="node-s">${st ? starRow(st) : cur ? 'Up next' : ''}</span></button>`;
-    }).join('')}</div></div>`).join('');
-
-  render(`<div class="home-head"><h1>Hey ${esc(who)}.</h1>${role === 'debug' ? '<span class="tag">Debug</span>' : ''}</div>
-    <h3>Up next</h3>
-    <div class="ups">${nextCard(m, 'math')}${nextCard(r, 'reading')}</div>
-    <h3>Watch: History</h3>
-    <div class="watch">${VIDEOS.map((v, i) => {
-      const b = v.beats.find((x) => x.cast && x.cast.length) || v.beats[1];
-      return `<button class="vid" style="--i:${i}" data-v="${v.id}" aria-label="${esc(v.title)}">
-        <span class="poster">${scene(b.set, b.cast || [], v.hue)}</span>
-        <span class="vid-badges">${state.likes?.[v.id] ? '<i class="ph-fill ph-heart"></i>' : ''}${state.watched?.[v.id] ? '<i class="ph-fill ph-check-circle"></i>' : ''}</span>
-        <i class="ph-fill ph-play-circle play"></i>
-        <span class="vid-t">${esc(v.title)}<small>About 1 min</small></span></button>`;
-    }).join('')}</div>
-    <h3>Games</h3>
-    <div class="games">${Object.entries(GAMES).map(([id, g], i) => `<button class="game-tile" style="--i:${i}" data-g="${id}">
-      <i class="ph-bold ${g.icon}"></i><b>${g.title}</b><small>${state.best[id] ? `Best ${state.best[id]}` : g.blurb}</small></button>`).join('')}</div>
-    <div class="tabs" role="tablist">
-      <button class="tab on" data-t="math" role="tab">Math path</button><button class="tab" data-t="reading" role="tab">Reading path</button>
-    </div>
-    <div class="map" id="map">${map('math')}</div>
-    <div class="foot"><span>${cleared} of ${allSkills.length} cleared</span>
+  render(`<div class="home-head"><h1>Hey ${esc(who)}.</h1>${role === 'debug' ? '<span class="tag">Debug</span>' : ''}
+      <button class="arcade-btn" id="arcade"><i class="ph-fill ph-game-controller"></i>Arcade</button></div>
+    <div class="subj" role="tablist">${Object.entries(SUBJECTS).map(([k, s]) => { const p = progress(k, state); return `<button class="subj-b${k === subject ? ' on' : ''}" role="tab" aria-selected="${k === subject}" data-s="${k}">
+      <i class="ph-bold ${s.icon}"></i><span>${s.name}</span><small>${p.done}/${p.total}</small></button>`; }).join('')}</div>
+    <div class="path">${us.map((u) => `<section class="punit${u.open ? '' : ' locked'}">
+      <div class="pbanner"><div><small>Unit ${u.i + 1}</small><b>${esc(u.name)}</b></div>
+        <span class="pcount">${u.open ? `${u.doneCount}/${u.nodes.length}` : '<i class="ph-fill ph-lock"></i>'}</span></div>
+      <div class="pnodes">${u.nodes.map(nodeHTML).join('')}</div></section>`).join('')}
+      ${current ? '' : '<div class="pdone"><i class="ph-fill ph-crown"></i><b>Path complete</b></div>'}</div>
+    <div class="foot"><span></span>
       <span>${role === 'debug' ? '<button class="link" id="dbg">Debug tools</button>' : ''}<button class="link" id="retest">Level check</button><button class="link" id="out">Log out</button></span></div>`);
 
-  app.querySelectorAll('.up[data-k], .node').forEach((b) => (b.onclick = () => { audio.sfx('tap'); runLesson(b.dataset.k); }));
-  app.querySelectorAll('.game-tile').forEach((b) => (b.onclick = () => runGame(b.dataset.g)));
-  app.querySelectorAll('.vid').forEach((b) => (b.onclick = () => watch(b.dataset.v)));
-  app.querySelectorAll('.tab').forEach((t) => (t.onclick = () => {
-    audio.sfx('tap');
-    app.querySelectorAll('.tab').forEach((x) => x.classList.toggle('on', x === t));
-    $('#map').innerHTML = map(t.dataset.t);
-    app.querySelectorAll('#map .node').forEach((b) => (b.onclick = () => { audio.sfx('tap'); runLesson(b.dataset.k); }));
+  const all = us.flatMap((u) => u.nodes);
+  app.querySelectorAll('.pnode').forEach((b) => (b.onclick = () => {
+    const n = all.find((x) => x.id === b.dataset.id);
+    if (!n.open) {
+      audio.sfx('wrong');
+      b.classList.remove('nope'); void b.offsetWidth; b.classList.add('nope');
+      return say(current ? `Locked. Finish "${current.title}" first.` : 'Locked.', 'sad', 1600);
+    }
+    audio.sfx('tap'); openNode(subject, n);
   }));
+  app.querySelectorAll('.subj-b').forEach((b) => (b.onclick = () => {
+    audio.sfx('tap'); state.ui = { ...(state.ui || {}), subject: b.dataset.s }; save(); home();
+  }));
+  $('#arcade').onclick = () => { audio.sfx('tap'); arcade(); };
   $('#retest').onclick = startAssessment;
   $('#out').onclick = () => { cloud.logout(); pinScreen(); };
   $('#dbg') && ($('#dbg').onclick = debugTools);
+  const cur = app.querySelector('.pnode.cur');
+  if (cur) setTimeout(() => cur.scrollIntoView({ behavior: 'smooth', block: 'center' }), 350);
 }
 
 // ── Debug role: sandbox profile + tools ──────────────────────────────
@@ -428,7 +504,7 @@ function debugTools() {
     <p class="lead">This profile is separate. Nothing here touches Atchi's data.</p>
     <div class="dbg-grid">
       <button class="btn ghost" data-a="xp">+500 XP</button>
-      <button class="btn ghost" data-a="all">Clear every lesson</button>
+      <button class="btn ghost" data-a="all">Clear every node</button>
       <button class="btn ghost" data-a="reset">Reset this profile</button>
       <button class="btn ghost" data-a="break">Force brain break</button>
       <button class="btn ghost" data-a="dash">Parent dashboard</button>
@@ -439,7 +515,7 @@ function debugTools() {
   app.querySelectorAll('[data-a]').forEach((b) => (b.onclick = () => {
     const a = b.dataset.a;
     if (a === 'xp') addXP(500, b);
-    if (a === 'all') { for (const u of [...PATH.math, ...PATH.reading]) for (const k of u.skills) state.mastery[k] = 3; save(); }
+    if (a === 'all') { for (const sub of Object.keys(SUBJECTS)) for (const u of units(sub)) for (const n of u.nodes) { if (n.type === 'video') state.watched = { ...(state.watched || {}), [n.id]: true }; else state.mastery[n.id] = 3; } save(); }
     if (a === 'reset') { state = fresh(); save(); hud(); }
     if (a === 'break') { sessionStart = 0; return maybeBreak(home); }
     if (a === 'dash') return dashboard();
@@ -462,21 +538,24 @@ async function dashboard() {
     $('#again').onclick = dashboard; $('#out').onclick = () => { cloud.logout(); pinScreen(); };
     return;
   }
-  const allSkills = [...PATH.math, ...PATH.reading].flatMap((u) => u.skills);
   const ago = (t) => { if (!t) return 'never'; const m = Math.round((Date.now() - new Date(t)) / 60000); return m < 60 ? `${m} min ago` : m < 1440 ? `${Math.round(m / 60)} h ago` : `${Math.round(m / 1440)} d ago`; };
   render(`<div class="home-head"><h1>Progress</h1><span class="tag">${role === 'debug' ? 'Debug' : 'Parent'}</span></div>
     ${kids.map((k) => {
       const p = migrate(k.progress || {});
-      const done = allSkills.filter((s) => (p.mastery[s] || 0) >= 1).length;
+      const prog = Object.keys(SUBJECTS).map((k) => progress(k, p));
+      const done = prog.reduce((a, x) => a + x.done, 0), steps = prog.reduce((a, x) => a + x.total, 0);
+      const where = Object.entries(SUBJECTS).map(([k, sub]) => { const w = walk(k, p); const u = w.units.find((uu) => uu.nodes.includes(w.current));
+        return `<div class="weak-row"><span><b>${sub.name}</b><small>${w.current ? `Unit ${u.i + 1}: ${esc(u.name)}` : 'Complete'}</small></span><span class="where">${w.current ? esc(w.current.title) : 'Done'}</span></div>`; }).join('');
       const acc = k.total ? Math.round((100 * k.right) / k.total) : 0;
       const weak = (k.skills || []).filter((s) => s.misses > 0).slice(0, 5);
       return `<h3>${esc(k.name)}</h3>
       <div class="kpis">
         <div class="level"><i class="ph-bold ph-lightning"></i><b>Lv ${lvl(p.xp)}</b><span>${p.xp} XP</span></div>
         <div class="level"><i class="ph-bold ph-check-circle"></i><b>${acc}%</b><span>${k.right} of ${k.total} right</span></div>
-        <div class="level"><i class="ph-bold ph-path"></i><b>${done}/${allSkills.length}</b><span>lessons cleared</span></div>
+        <div class="level"><i class="ph-bold ph-path"></i><b>${done}/${steps}</b><span>path steps done</span></div>
         <div class="level"><i class="ph-bold ph-clock"></i><b>${ago(k.last_active)}</b><span>last active</span></div>
       </div>
+      <h3>On the path</h3><div class="weak">${where}</div>
       <h3>Needs work</h3>
       ${weak.length ? `<div class="weak">${weak.map((s) => `<div class="weak-row"><span><b>${esc(LESSONS[s.skill]?.title || VIDEOS.find((v) => `hist-${v.id}` === s.skill)?.title || s.skill)}</b><small>${s.subject}</small></span>
         <span class="weak-n">${s.right}/${s.attempts}</span></div>`).join('')}</div>` : '<p class="lead">Nothing flagged yet.</p>'}
