@@ -1,15 +1,15 @@
-import { ASSESSMENT, LESSONS, PATH } from './content.js?v=9';
-import * as cloud from './cloud.js?v=9';
-import * as voice from './speech.js?v=9';
-import * as jio from './mascot.js?v=9';
-import * as audio from './audio.js?v=9';
-import { hasGen, make } from './gen.js?v=9';
-import { GAMES, play } from './games.js?v=9';
-import { confetti, confettiFrom } from './fx.js?v=9';
-import { VIDEOS } from './history.js?v=9';
-import { scene } from './scene.js?v=9';
-import { openFeed } from './feed.js?v=9';
-import { SUBJECTS, PASS, units, walk, progress, questions } from './path.js?v=9';
+import { ASSESSMENT, LESSONS, PATH } from './content.js?v=10';
+import * as cloud from './cloud.js?v=10';
+import * as voice from './speech.js?v=10';
+import * as jio from './mascot.js?v=10';
+import * as audio from './audio.js?v=10';
+import { hasGen, make } from './gen.js?v=10';
+import { GAMES, play } from './games.js?v=10';
+import { confetti, confettiFrom } from './fx.js?v=10';
+import { VIDEOS } from './history.js?v=10';
+import { scene } from './scene.js?v=10';
+import { openFeed } from './feed.js?v=10';
+import { SUBJECTS, PASS, units, walk, progress, questions } from './path.js?v=10';
 
 // ── State ──────────────────────────────────────────────────────────────
 // Each role saves to its own local key so a debug session never touches Atchi's save.

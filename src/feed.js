@@ -1,13 +1,20 @@
 // History feed: vertical, swipeable 1-minute videos built from illustrated scenes,
 // voiceover (Cloak TTS), word-by-word captions, sound effects, likes, and a FAQ sheet.
-import { VIDEOS as ALL } from './history.js?v=9';
-import { scene } from './scene.js?v=9';
-import * as voice from './speech.js?v=9';
-import * as audio from './audio.js?v=9';
+import { VIDEOS as ALL } from './history.js?v=10';
+import { scene } from './scene.js?v=10';
+import * as voice from './speech.js?v=10';
+import * as audio from './audio.js?v=10';
 
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const words = (t) => t.trim().split(/\s+/).length;
 const CAMS = ['cam-in', 'cam-pan-r', 'cam-out', 'cam-pan-l'];
+const GAP = 1.5; // seconds of breathing room after each line
+const NUM = ['One', 'Two', 'Three', 'Four'];
+// Story beats + recap beats. The recap card builds one point at a time.
+export const allBeats = (v) => [...v.beats, ...(v.recap || []).map((pt, k) => ({
+  set: 'title', recap: k + 1, sfx: 'chime',
+  say: `${k === 0 ? "Let's recap. " : ''}${NUM[k]}: ${pt}.`,
+}))];
 
 class Timer {
   start(ms, fn) { this.clear(); this.fn = fn; this.left = ms; this.resume(); }
@@ -139,7 +146,7 @@ function reelHTML(v, i, state, count) {
   return `<section class="reel" data-i="${i}" style="--hue:${v.hue}"><div class="r-frame">
     <div class="r-stage"><div class="r-layers"></div><div class="r-over"></div><div class="r-hearts"></div>
       <div class="r-paused"><i class="ph-fill ph-play"></i></div></div>
-    <div class="r-prog">${v.beats.map(() => '<span><i></i></span>').join('')}</div>
+    <div class="r-prog">${allBeats(v).map(() => '<span><i></i></span>').join('')}</div>
     <div class="r-rail">
       <button class="r-btn r-like${liked ? ' on' : ''}" aria-pressed="${!!liked}" aria-label="Like"><i class="ph-fill ph-heart"></i><small>${liked ? 'Liked' : 'Like'}</small></button>
       <button class="r-btn r-faq" aria-label="FAQ"><i class="ph-fill ph-question"></i><small>FAQ</small></button>
@@ -172,6 +179,7 @@ class Player {
   constructor(el, v, ctx, muted) {
     Object.assign(this, { el, v, ctx, muted });
     this.i = -1; this.paused = false; this.ended = false; this.timer = new Timer(); this.tok = 0;
+    this.beats = allBeats(v);
     this.layers = el.querySelector('.r-layers'); this.over = el.querySelector('.r-over');
     this.cap = el.querySelector('.r-cap'); this.segs = [...el.querySelectorAll('.r-prog span')];
   }
@@ -201,16 +209,16 @@ class Player {
 
   async beat(i) {
     const tok = ++this.tok;
-    if (i >= this.v.beats.length) return this.finish();
+    if (i >= this.beats.length) return this.finish();
     this.i = i;
-    const b = this.v.beats[i];
-    const est = Math.max(3, words(b.say) / 2.6);
+    const b = this.beats[i];
+    const est = Math.max(3, words(b.say) / 2.3);
 
     // scene: crossfade a new layer over the old one
     const layer = document.createElement('div');
     layer.className = `r-layer ${CAMS[i % CAMS.length]}`;
     layer.style.setProperty('--dur', `${est + 1}s`);
-    const cast = b.cast || (b.set === 'title' && this.v.hero ? [[this.v.hero, 180, { anim: 'a-wave', talk: true, s: 1.3 }]] : []);
+    const cast = b.cast || (b.set === 'title' && !b.recap && this.v.hero ? [[this.v.hero, 180, { anim: 'a-wave', talk: true, s: 1.3 }]] : []);
     layer.innerHTML = scene(b.set, cast, b.set === 'title' ? this.v.hue : undefined);
     this.layers.appendChild(layer);
     const old = [...this.layers.children].slice(0, -1);
@@ -220,7 +228,7 @@ class Player {
     if (!this.muted.v) audio.sfx(b.sfx || 'whoosh');
     this.cap.innerHTML = '';
     // warm the next lines while this one plays
-    if (!this.muted.v) this.v.beats.slice(i + 1, i + 3).forEach((n) => voice.prefetch(n.say));
+    if (!this.muted.v) this.beats.slice(i + 1, i + 3).forEach((n) => voice.prefetch(n.say));
 
     let dur = null;
     if (!this.muted.v) {
@@ -233,8 +241,8 @@ class Player {
     const d = dur || est;
     this.caption(b.say, d);
     layer.style.setProperty('--dur', `${d + 1}s`);
-    const seg = this.segs[i]; seg.style.setProperty('--d', `${d + 0.4}s`); seg.className = 'now';
-    this.timer.start((d + 0.4) * 1000, () => { if (tok === this.tok) this.beat(i + 1); });
+    const seg = this.segs[i]; seg.style.setProperty('--d', `${d + GAP}s`); seg.className = 'now';
+    this.timer.start((d + GAP) * 1000, () => { if (tok === this.tok) this.beat(i + 1); });
     if (this.paused) this.timer.pause();
   }
 
@@ -249,6 +257,13 @@ class Player {
   }
 
   overlay(o, i) {
+    const b = this.beats[i];
+    if (b.recap) {
+      const pts = this.v.recap;
+      this.over.innerHTML = `<div class="ov-recap"><h3><i class="ph-fill ph-list-checks"></i>Recap</h3><ol>${pts.map((p, k) =>
+        `<li class="${k < b.recap - 1 ? 'shown' : k === b.recap - 1 ? 'shown now' : ''}"><span>${k + 1}</span>${esc(p)}</li>`).join('')}</ol></div>`;
+      return;
+    }
     if (!o) { this.over.innerHTML = ''; return; }
     if (o.title) {
       this.over.innerHTML = `<h2 class="ov-title">${o.title.split(' ').map((w, wi) => `<span class="ov-w">${[...w].map((ch, ci) =>

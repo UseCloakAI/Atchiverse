@@ -1,5 +1,5 @@
 // Mini-games. Short rounds (40-60s), instant feedback, combos. Each one trains a gap from his results.
-import { make } from './gen.js?v=9';
+import { make } from './gen.js?v=10';
 
 export const GAMES = {
   sprint: { title: 'Fact Sprint', icon: 'ph-lightning', blurb: '60 seconds. Answer fast, build a combo.', secs: 60 },

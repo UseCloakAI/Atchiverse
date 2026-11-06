@@ -597,14 +597,14 @@ body.feed-open { overflow: hidden; }
 @media (min-width: 700px) { .r-frame { height: min(100dvh, 860px); --w: calc(min(100dvh, 860px) * 9 / 16); border-radius: 28px; overflow: visible; } .r-stage { border-radius: 28px; } }
 .r-stage { position: absolute; inset: 0; overflow: hidden; cursor: pointer; }
 .r-layers, .r-layer { position: absolute; inset: 0; }
-.r-layer { animation: layer-in .6s var(--ease) both; }
+.r-layer { animation: layer-in 1s var(--ease) both; }
 .r-layer svg { width: 100%; height: 100%; display: block; animation: var(--cam, none) var(--dur, 8s) ease-out both; transform-origin: 50% 60%; }
 .cam-in { --cam: cam-in; } .cam-out { --cam: cam-out; } .cam-pan-r { --cam: cam-pan-r; } .cam-pan-l { --cam: cam-pan-l; }
 @keyframes layer-in { from { opacity: 0; transform: scale(1.04); } }
-@keyframes cam-in { from { transform: scale(1); } to { transform: scale(1.12); } }
-@keyframes cam-out { from { transform: scale(1.14); } to { transform: scale(1.02); } }
-@keyframes cam-pan-r { from { transform: scale(1.12) translateX(-3%); } to { transform: scale(1.12) translateX(3%); } }
-@keyframes cam-pan-l { from { transform: scale(1.12) translateX(3%); } to { transform: scale(1.12) translateX(-3%); } }
+@keyframes cam-in { from { transform: scale(1); } to { transform: scale(1.05); } }
+@keyframes cam-out { from { transform: scale(1.06); } to { transform: scale(1.01); } }
+@keyframes cam-pan-r { from { transform: scale(1.06) translateX(-1.5%); } to { transform: scale(1.06) translateX(1.5%); } }
+@keyframes cam-pan-l { from { transform: scale(1.06) translateX(1.5%); } to { transform: scale(1.06) translateX(-1.5%); } }
 .r-stage::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(to bottom, rgb(0 0 0 / .35), transparent 18%, transparent 58%, rgb(0 0 0 / .72)); }
 
 .r-prog { position: absolute; z-index: 3; top: calc(env(safe-area-inset-top) + 60px); left: 12px; right: 12px; display: flex; gap: 4px; }
@@ -852,3 +852,24 @@ body.jio-talking .reel .mini-jio { animation: talk .26s ease-in-out infinite alt
 .where { font-weight: 750; color: var(--accent); text-align: right; }
 .games.arcade { margin-top: 20px; }
 @media (max-width: 600px) { .games.arcade { grid-template-columns: 1fr; } .games.arcade .game-tile { min-height: 0; grid-template-columns: auto 1fr; } .games.arcade small { display: block; } }
+
+/* Slower, calmer videos */
+.ov-ch { animation-duration: .8s; }
+.ov-chip, .ov-fact { animation-delay: .6s; }
+.r-cap { font-size: clamp(1.3rem, 5.4vw, 1.6rem); line-height: 1.32; }
+.ov-recap {
+  position: absolute; left: 18px; right: 18px; top: 18%; padding: 22px 20px; border-radius: 28px;
+  background: rgb(255 255 255 / .96); color: #17161c; box-shadow: 0 20px 50px rgb(0 0 0 / .35); animation: say .6s var(--spring) both;
+}
+.ov-recap h3 { display: flex; align-items: center; gap: 8px; margin: 0 0 14px; font-size: 1.5rem; }
+.ov-recap h3 i { color: var(--accent); }
+.ov-recap ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.ov-recap li { display: flex; gap: 12px; align-items: center; font-weight: 750; font-size: 1.12rem; line-height: 1.25; opacity: 0; transform: translateY(8px); }
+.ov-recap li span { width: 34px; height: 34px; flex-shrink: 0; border-radius: 999px; display: grid; place-items: center; background: var(--surface-2); font-weight: 850; }
+.ov-recap li.shown { opacity: 1; transform: none; }
+.ov-recap li.now { animation: recap-in .6s var(--spring); }
+.ov-recap li.now span { background: var(--accent); color: var(--on-accent); }
+.ov-recap li.shown:not(.now) span { background: var(--good-soft); color: var(--good); }
+@keyframes recap-in { from { opacity: 0; transform: translateX(-16px) scale(.96); } }
+@media (prefers-reduced-motion: reduce) { .ov-recap li { opacity: 1; transform: none; } }
+@media (max-width: 699px) { .ov-recap { right: 76px; left: 14px; padding: 18px 16px; } .ov-recap li { font-size: 1.02rem; } }
