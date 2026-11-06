@@ -1,6 +1,6 @@
-import { ASSESSMENT, LESSONS } from './content.js';
-import * as cloud from './cloud.js';
-import * as voice from './speech.js';
+import { ASSESSMENT, LESSONS } from './content.js?v=3';
+import * as cloud from './cloud.js?v=3';
+import * as voice from './speech.js?v=3';
 
 const KEY = 'atchiverse:v1';
 const fresh = () => ({ xp: 0, streak: 0, levels: {}, missed: [], done: [] });
