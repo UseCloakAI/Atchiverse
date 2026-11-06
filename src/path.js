@@ -1,8 +1,8 @@
 // Path model. Every subject is one ordered path of units.
 // Unit = lessons (or videos) in order → review → unit test. Passing the test unlocks the next unit.
-import { ASSESSMENT, LESSONS, PATH } from './content.js?v=10';
-import { VIDEOS, HIST_PATH } from './history.js?v=10';
-import { hasGen, make } from './gen.js?v=10';
+import { ASSESSMENT, LESSONS, PATH } from './content.js?v=11';
+import { VIDEOS, HIST_PATH } from './history.js?v=11';
+import { hasGen, make } from './gen.js?v=11';
 
 export const SUBJECTS = {
   math: { name: 'Math', icon: 'ph-calculator' },

@@ -1,5 +1,7 @@
 // Illustrated scenes for the history videos. Portrait 360x640 SVG, layered:
 // sky → far landscape → landmarks → characters. Animation is CSS (classes a-*), see style.css.
+import { MAPS } from './maps.js?v=11';
+
 let uid = 0;
 const id = (p) => `${p}${++uid}`;
 const H = 380; // horizon
@@ -83,45 +85,39 @@ const caveArt = () => `<rect width="360" height="640" fill="#2a1c14"/><path d="M
   <g opacity=".85">${[[70, 150], [210, 120]].map(([x, y], i) => `<g ${pop(0.3 + i * 0.3)}><g transform="translate(${x} ${y})"><ellipse rx="32" ry="16" fill="#b5532a"/><circle cx="30" cy="-10" r="10" fill="#b5532a"/>${[-20, -6, 8, 20].map((l) => `<rect x="${l}" y="10" width="4" height="18" fill="#b5532a"/>`).join('')}<path d="M34 -18 q10 -14 2 -24 M28 -18 q-2 -16 -10 -20" stroke="#b5532a" stroke-width="3" fill="none"/></g></g>`).join('')}
   ${[[150, 220], [290, 200]].map(([x, y], i) => `<g ${pop(0.9 + i * 0.2)}><g transform="translate(${x} ${y}) rotate(${i ? 12 : -10})" fill="#e3c08a" opacity=".8"><ellipse rx="10" ry="13"/>${[-12, -5, 2, 9].map((fx, j) => `<rect x="${fx - 2}" y="${-28 + (j % 2) * 4}" width="5" height="16" rx="2.5"/>`).join('')}<rect x="10" y="-6" width="12" height="5" rx="2.5" transform="rotate(-30 10 -6)"/></g></g>`).join('')}</g>`;
 
-// Stylized maps (not to scale). Land, water, labels, a pulsing pin.
+// Real maps: Natural Earth shaded-relief image + real coastlines, rivers and lakes (tools/build_maps.py).
+// Pins and labels sit at true coordinates. Rivers draw themselves in; routes flow.
 function map(kind) {
-  const sea = '#7fb6d9', land = '#e8d6a8', land2 = '#d9c48d';
-  const label = (x, y, t, s = 15, c = '#3a2a14') => `<text x="${x}" y="${y}" font-size="${s}" font-weight="800" fill="${c}" text-anchor="middle" font-family="inherit" class="a-pop" style="animation-delay:.5s">${t}</text>`;
-  const pin = (x, y) => `<circle class="a-ping" cx="${x}" cy="${y}" r="10" fill="#ff5a36"/><circle cx="${x}" cy="${y}" r="6" fill="#ff5a36" stroke="#fff" stroke-width="2"/>`;
-  const riv = (d, w = 5) => `<path class="a-draw" d="${d}" stroke="#3b82c4" stroke-width="${w}" fill="none" stroke-linecap="round"/>`;
-  const base = `<rect width="360" height="640" fill="${sea}"/><g opacity=".25" stroke="#fff">${Array.from({ length: 12 }, (_, i) => `<line x1="0" x2="360" y1="${i * 55}" y2="${i * 55}"/>`).join('')}</g>`;
-  const M = {
-    world: `<path d="M150 210 Q190 190 215 230 Q230 300 200 360 Q180 410 160 360 Q140 300 130 250Z" fill="${land}"/>
-      <path d="M200 120 Q280 90 340 140 Q350 200 300 210 Q240 200 215 175Z" fill="${land2}"/><path d="M20 120 Q70 100 90 160 Q80 230 60 280 Q40 230 30 180Z" fill="${land2}"/>
-      ${riv('M175 290 Q200 220 240 170', 3).replace('#3b82c4', '#ff5a36').replace('stroke-linecap', 'stroke-dasharray="8 7" stroke-linecap')}
-      ${riv('M240 165 Q290 150 320 170', 3).replace('#3b82c4', '#ff5a36').replace('stroke-linecap', 'stroke-dasharray="8 7" stroke-linecap')}
-      ${riv('M215 175 Q140 120 70 150', 3).replace('#3b82c4', '#ff5a36').replace('stroke-linecap', 'stroke-dasharray="8 7" stroke-linecap')}
-      ${pin(175, 290)}${label(175, 330, 'AFRICA')}${label(290, 120, 'ASIA')}${label(55, 100, 'AMERICAS', 13)}`,
-    fertile: `<path d="M0 120 H360 V520 H0Z" fill="${land}"/><path d="M0 120 H120 Q100 200 0 230Z" fill="${sea}"/>
-      <path class="a-draw" d="M90 330 Q120 200 200 170 Q280 160 320 260" stroke="#7fbf5a" stroke-width="44" fill="none" stroke-linecap="round" opacity=".75"/>
-      ${riv('M210 160 Q240 260 280 380')}${riv('M180 175 Q200 280 262 384', 4)}
-      ${label(200, 140, 'FERTILE CRESCENT', 14)}${label(300, 330, 'Tigris', 13, '#1f4f80')}${label(205, 320, 'Euphrates', 13, '#1f4f80')}${pin(250, 330)}${label(250, 420, 'MESOPOTAMIA', 15)}`,
-    nile: `<path d="M40 60 H320 V600 H40Z" fill="#e9c98a"/><path d="M40 60 H320 V110 H40Z" fill="${sea}"/>
-      <path d="M150 110 L180 160 L210 110Z" fill="#8cc06a"/>${riv('M180 600 Q170 480 190 380 Q200 260 180 160', 7)}
-      <path d="M180 600 Q170 480 190 380 Q200 260 180 160" stroke="#8cc06a" stroke-width="26" fill="none" opacity=".5"/>
-      ${label(260, 200, 'Lower Egypt', 13)}${label(260, 360, 'Upper Egypt', 13)}${label(260, 520, 'KUSH', 16, '#8a3a12')}${label(110, 90, 'Mediterranean Sea', 12, '#1f4f80')}${pin(180, 200)}`,
-    india: `<path d="M60 120 H320 V200 Q300 260 250 330 Q205 420 180 470 Q150 400 120 330 Q80 260 60 200Z" fill="${land}"/>
-      <path d="M60 110 Q190 70 320 110 V140 Q190 100 60 140Z" fill="#cfd8e0"/>${riv('M110 140 Q100 220 90 250', 5)}${riv('M180 150 Q240 200 300 230', 5)}
-      ${label(95, 280, 'Indus', 13, '#1f4f80')}${label(255, 260, 'Ganges', 13, '#1f4f80')}${label(190, 100, 'Himalayas', 13, '#4a5560')}${pin(100, 210)}`,
-    china: `<path d="M40 100 H340 V520 H40Z" fill="${land}"/><path d="M290 100 H360 V520 H300 Q270 400 300 300 Q280 200 290 100Z" fill="${sea}"/>
-      ${riv('M60 220 Q140 160 190 230 Q240 280 290 220', 7).replace('#3b82c4', '#c9a227')}${riv('M60 380 Q160 330 220 400 Q260 430 300 400', 6)}
-      ${label(170, 190, 'Huang He', 13, '#7a5a10')}${label(170, 300, '(Yellow River)', 11, '#7a5a10')}${label(170, 450, 'Yangtze', 13, '#1f4f80')}${pin(180, 225)}`,
-    greece: `<path d="M120 140 Q200 120 230 180 Q200 230 230 280 Q210 320 180 300 Q170 360 140 340 Q120 280 140 240 Q100 200 120 140Z" fill="${land}"/>
-      ${[[270, 260, 14], [250, 340, 10], [300, 320, 9], [200, 420, 26]].map(([x, y, r]) => `<ellipse cx="${x}" cy="${y}" rx="${r * 1.4}" ry="${r * 0.7}" fill="${land}"/>`).join('')}
-      <path d="M140 170 l10 -18 l10 18 M170 200 l10 -18 l10 18 M150 250 l8 -14 l8 14" stroke="#8a7a50" stroke-width="3" fill="none"/>
-      ${pin(205, 255)}${label(225, 240, 'Athens', 13)}${pin(160, 310)}${label(140, 330, 'Sparta', 13)}${label(180, 470, 'Mediterranean Sea', 12, '#1f4f80')}`,
-    rome: `<ellipse cx="180" cy="340" rx="170" ry="120" fill="#c5e0b4"/><ellipse cx="180" cy="340" rx="120" ry="64" fill="${sea}"/>
-      <path d="M150 240 Q170 260 175 290 Q190 320 205 340 L198 348 Q178 330 165 300 Q150 280 140 250Z" fill="#c5e0b4"/>
-      ${pin(165, 285)}${label(140, 280, 'Rome', 13)}${label(180, 350, 'Mediterranean', 12, '#1f4f80')}${label(180, 200, 'ROMAN EMPIRE', 15, '#5a2a6e')}`,
-    silk: `<path d="M0 140 H360 V500 H0Z" fill="${land}"/>${riv('M330 300 Q260 250 200 290 Q140 330 80 280 Q40 250 20 270', 4).replace('#3b82c4', '#b3261e').replace('stroke-linecap', 'stroke-dasharray="10 8" stroke-linecap')}
-      ${pin(330, 300)}${label(320, 340, 'China', 13)}${pin(20, 270)}${label(40, 240, 'Rome', 13)}${label(180, 200, 'SILK ROAD', 16, '#b3261e')}`,
+  const m = MAPS[kind];
+  if (!m) return '';
+  const gid = id('vig');
+  const label = (l, i) => {
+    const water = l.k === 'water', river = l.k === 'river';
+    const fill = water ? '#0f3a63' : river ? '#0b4f9c' : '#2a1a08';
+    const style = `${water || river ? 'font-style:italic;' : ''}animation-delay:${0.5 + i * 0.12}s`;
+    return `<text class="a-pop map-label" style="${style}" x="${l.x}" y="${l.y}" font-size="${l.s}" fill="${fill}" text-anchor="middle"
+      font-weight="${water || river ? 700 : 850}" letter-spacing="${l.s >= 13 ? 1.2 : 0.2}" stroke="#fff8ea" stroke-width="3.2" stroke-linejoin="round" paint-order="stroke">${l.t}</text>`;
   };
-  return base + M[kind];
+  const pin = (p, i) => {
+    const right = p.side ? p.side !== 'l' : p.x < 230;
+    return `<g class="a-pop" style="animation-delay:${0.9 + i * 0.25}s"><circle class="a-ping" cx="${p.x}" cy="${p.y}" r="9" fill="#ff5a36"/>
+      <circle cx="${p.x}" cy="${p.y}" r="5.5" fill="#ff5a36" stroke="#fff" stroke-width="2"/>
+      <text x="${p.x + (right ? 10 : -10)}" y="${p.y + 4}" font-size="11.5" font-weight="850" fill="#1f0d08" text-anchor="${right ? 'start' : 'end'}"
+        stroke="#fff" stroke-width="3.4" stroke-linejoin="round" paint-order="stroke">${p.t}</text></g>`;
+  };
+  return `<defs><radialGradient id="${gid}" cx=".5" cy=".45" r=".75"><stop offset=".6" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".35"/></radialGradient></defs>
+    <rect width="360" height="640" fill="#a9c8de"/>
+    <image href="${m.img}" width="360" height="640" preserveAspectRatio="none"/>
+    ${m.region ? `<path class="a-river" pathLength="1" d="${m.region}" fill="none" stroke="#5fc24a" stroke-opacity=".38" stroke-width="30" stroke-linecap="round" stroke-linejoin="round"/>` : ''}
+    <path d="${m.coast}" fill="none" stroke="#fffaf0" stroke-opacity=".55" stroke-width=".8" stroke-linejoin="round"/>
+    <path d="${m.lakes}" fill="#5c9fd6" stroke="#2f6fae" stroke-width=".5"/>
+    <path d="${m.minor}" fill="none" stroke="#3b82c4" stroke-opacity=".55" stroke-width=".8" stroke-linecap="round"/>
+    <path d="${m.rivers}" fill="none" stroke="#fff" stroke-opacity=".6" stroke-width="4.2" stroke-linecap="round" stroke-linejoin="round"/>
+    <path class="a-river" pathLength="1" d="${m.rivers}" fill="none" stroke="#1f6fcf" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+    ${m.routes.map((d) => `<path d="${d}" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" opacity=".8"/>
+      <path class="a-route" d="${d}" fill="none" stroke="#ff5a36" stroke-width="3" stroke-dasharray="7 6" stroke-linecap="round" stroke-linejoin="round"/>`).join('')}
+    <rect width="360" height="640" fill="url(#${gid})" pointer-events="none"/>
+    ${m.labels.map(label).join('')}${m.pins.map(pin).join('')}`;
 }
 
 // Named sets. Each is a full background for one or more beats.

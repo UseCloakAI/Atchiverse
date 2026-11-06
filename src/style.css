@@ -873,3 +873,8 @@ body.jio-talking .reel .mini-jio { animation: talk .26s ease-in-out infinite alt
 @keyframes recap-in { from { opacity: 0; transform: translateX(-16px) scale(.96); } }
 @media (prefers-reduced-motion: reduce) { .ov-recap li { opacity: 1; transform: none; } }
 @media (max-width: 699px) { .ov-recap { right: 76px; left: 14px; padding: 18px 16px; } .ov-recap li { font-size: 1.02rem; } }
+/* Real maps: rivers draw in, routes flow */
+.a-river { stroke-dasharray: 1; stroke-dashoffset: 1; animation: draw 2.4s var(--ease) .3s forwards; }
+.a-route { animation: flow 1.6s linear infinite; }
+@media (prefers-reduced-motion: reduce) { .a-river { stroke-dashoffset: 0; } }
+.credit { margin: 16px 0 0; text-align: center; color: var(--muted); font-size: .78rem; font-weight: 600; }

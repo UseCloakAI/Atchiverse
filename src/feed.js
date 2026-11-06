@@ -1,9 +1,9 @@
 // History feed: vertical, swipeable 1-minute videos built from illustrated scenes,
 // voiceover (Cloak TTS), word-by-word captions, sound effects, likes, and a FAQ sheet.
-import { VIDEOS as ALL } from './history.js?v=10';
-import { scene } from './scene.js?v=10';
-import * as voice from './speech.js?v=10';
-import * as audio from './audio.js?v=10';
+import { VIDEOS as ALL } from './history.js?v=11';
+import { scene } from './scene.js?v=11';
+import * as voice from './speech.js?v=11';
+import * as audio from './audio.js?v=11';
 
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const words = (t) => t.trim().split(/\s+/).length;
@@ -172,7 +172,8 @@ function faqHTML(v, state) {
       <div class="faq-a"><p>${esc(f.a)}</p><button class="spk" data-say="${esc(`${f.q} ${f.a}`)}" aria-label="Read out loud"><i class="ph-bold ph-speaker-high"></i></button></div></div>`).join('')}</div>
     <div class="faq-check"><p class="label"><i class="ph-bold ph-target"></i>Quick check${state.checks?.[v.id] ? ' (done)' : ''}</p><h3>${esc(v.check.q)}</h3>
       <div class="chk-grid">${[...v.check.choices].sort(() => Math.random() - 0.5).map((c) => `<button class="choice chk" data-v="${esc(c)}">${esc(c)}</button>`).join('')}</div>
-      <p class="chk-res"></p></div>`;
+      <p class="chk-res"></p></div>
+    <p class="credit">Maps made from Natural Earth data (public domain).</p>`;
 }
 
 class Player {
