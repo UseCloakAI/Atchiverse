@@ -1,6 +1,6 @@
 // Illustrated scenes for the history videos. Portrait 360x640 SVG, layered:
 // sky → far landscape → landmarks → characters. Animation is CSS (classes a-*), see style.css.
-import { MAPS } from './maps.js?v=11';
+import { MAPS } from './maps.js?v=12';
 
 let uid = 0;
 const id = (p) => `${p}${++uid}`;

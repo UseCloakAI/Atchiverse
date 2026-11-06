@@ -1,9 +1,9 @@
 // History feed: vertical, swipeable 1-minute videos built from illustrated scenes,
 // voiceover (Cloak TTS), word-by-word captions, sound effects, likes, and a FAQ sheet.
-import { VIDEOS as ALL } from './history.js?v=11';
-import { scene } from './scene.js?v=11';
-import * as voice from './speech.js?v=11';
-import * as audio from './audio.js?v=11';
+import { VIDEOS as ALL } from './history.js?v=12';
+import { scene } from './scene.js?v=12';
+import * as voice from './speech.js?v=12';
+import * as audio from './audio.js?v=12';
 
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const words = (t) => t.trim().split(/\s+/).length;
@@ -38,7 +38,7 @@ export function openFeed(ctx, startId, ids) {
       <span class="feed-title">History</span>
       <button class="feed-btn" id="f-mute" aria-label="Mute"><i class="ph-bold ph-speaker-high"></i></button>
     </div>
-    <div class="feed-scroll">${VIDEOS.map((v, i) => reelHTML(v, i, ctx.state, VIDEOS.length)).join('')}</div>
+    <div class="feed-scroll">${VIDEOS.map((v, i) => reelHTML(v, i, ctx.state)).join('')}</div>
     <div class="faq" aria-hidden="true"><div class="faq-card"></div></div>`;
   document.body.appendChild(root);
   document.body.classList.add('feed-open');
@@ -64,14 +64,14 @@ export function openFeed(ctx, startId, ids) {
   const start = Math.max(0, VIDEOS.findIndex((v) => v.id === startId));
   scroller.scrollTop = start * scroller.clientHeight;
 
-  const close = () => {
+  const close = (silent) => {
     players.forEach((p) => p.reset());
     voice.stop(); audio.resumeAll();
     io.disconnect(); removeEventListener('keydown', onKey);
     root.classList.add('closing');
     document.body.classList.remove('feed-open');
     setTimeout(() => root.remove(), 260);
-    ctx.onClose?.();
+    if (!silent) ctx.onClose?.();
   };
   root.querySelector('#f-close').onclick = close;
   root.querySelector('#f-mute').onclick = (e) => {
@@ -92,7 +92,7 @@ export function openFeed(ctx, startId, ids) {
   // FAQ sheet
   const faq = root.querySelector('.faq');
   let faqWasPlaying = false;
-  const openFaq = (v) => {
+  const openFaq = (v, opts = {}) => {
     faqWasPlaying = active && !active.paused;
     active?.pause(true);
     faq.querySelector('.faq-card').innerHTML = faqHTML(v, ctx.state);
@@ -101,18 +101,44 @@ export function openFeed(ctx, startId, ids) {
     faq.querySelectorAll('.faq-q').forEach((b) => (b.onclick = () => { b.parentElement.classList.toggle('open'); audio.sfx('tap'); }));
     faq.querySelectorAll('[data-say]').forEach((b) => (b.onclick = (e) => { e.stopPropagation(); voice.say(b.dataset.say); }));
     faq.querySelector('#faq-close').onclick = closeFaq;
+    wireQuiz(v);
+    if (opts.quiz) setTimeout(() => faq.querySelector('.faq-check')?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 350);
+  };
+  // The quiz must be answered correctly before the path moves on. Wrong answer: try again.
+  const nextBtnHTML = () => `<button class="btn quiz-next" id="quiz-next">${esc(ctx.nextInfo().label)} <i class="ph-bold ph-arrow-right"></i></button>`;
+  const wireQuiz = (v) => {
+    const box = faq.querySelector('.faq-check');
+    if (ctx.state.checks?.[v.id]) box.insertAdjacentHTML('beforeend', nextBtnHTML());
     faq.querySelectorAll('.chk').forEach((b) => (b.onclick = () => {
       const ok = b.dataset.v === v.check.a;
-      faq.querySelectorAll('.chk').forEach((x) => { x.disabled = true; if (x.dataset.v === v.check.a) x.classList.add('right'); });
-      if (!ok) b.classList.add('wrong');
+      faq.querySelectorAll('.chk').forEach((x) => (x.disabled = true));
+      b.classList.add(ok ? 'right' : 'wrong');
       audio.sfx(ok ? 'win' : 'wrong');
       ctx.log({ kind: 'history', subject: 'history', skill: `hist-${v.id}`, grade: 6, question: v.check.q, answer: b.dataset.v, correct: ok });
       const res = faq.querySelector('.chk-res');
-      res.textContent = ok ? 'Correct! +10 XP' : `Not quite. It's "${v.check.a}".`;
-      res.className = `chk-res ${ok ? 'ok' : 'no'}`;
-      if (ok) { ctx.state.checks = { ...(ctx.state.checks || {}), [v.id]: true }; ctx.addXP(10, b); }
+      box.querySelector('#quiz-next')?.remove();
+      if (ok) {
+        const first = !ctx.state.checks?.[v.id];
+        ctx.state.checks = { ...(ctx.state.checks || {}), [v.id]: true };
+        res.textContent = first ? 'Correct! +10 XP. Next one unlocked.' : 'Correct!';
+        res.className = 'chk-res ok';
+        if (first) ctx.addXP(10, b); else ctx.save();
+        box.insertAdjacentHTML('beforeend', nextBtnHTML());
+        box.querySelector('#quiz-next').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        players.forEach((pl) => pl.v.id === v.id && pl.endButtons());
+      } else {
+        res.innerHTML = 'Not quite. Read the answers above, then <button class="link" id="quiz-retry">try again</button>.';
+        res.className = 'chk-res no';
+        res.querySelector('#quiz-retry').onclick = () => {
+          audio.sfx('tap'); res.textContent = ''; res.className = 'chk-res';
+          const grid = faq.querySelector('.chk-grid');
+          [...grid.children].sort(() => Math.random() - 0.5).forEach((x) => { x.disabled = false; x.classList.remove('right', 'wrong'); grid.appendChild(x); });
+        };
+      }
     }));
   };
+  faq.addEventListener('click', (e) => { if (e.target.closest('#quiz-next')) { audio.sfx('tap'); goOn(); } });
+  const goOn = () => { close(true); ctx.goNext(); };
   const closeFaq = () => {
     voice.stop();
     faq.classList.remove('open'); faq.setAttribute('aria-hidden', 'true');
@@ -125,10 +151,8 @@ export function openFeed(ctx, startId, ids) {
     el.querySelector('.r-faq').onclick = () => openFaq(v);
     el.querySelector('.r-like').onclick = (e) => p.like(e.currentTarget);
     el.querySelector('.r-replay').onclick = () => p.restart();
-    el.querySelector('.end-replay').onclick = () => p.restart();
-    el.querySelector('.end-faq').onclick = () => openFaq(v);
-    const nextBtn = el.querySelector('.end-next');
-    if (nextBtn) nextBtn.onclick = () => scroller.scrollBy({ top: scroller.clientHeight, behavior: 'smooth' });
+    p.openQuiz = () => openFaq(v, { quiz: true });
+    p.goOn = goOn;
     // tap = pause/play, double tap = like
     let lastTap = 0, tapTimer;
     el.querySelector('.r-stage').addEventListener('click', (e) => {
@@ -141,7 +165,7 @@ export function openFeed(ctx, startId, ids) {
   return close;
 }
 
-function reelHTML(v, i, state, count) {
+function reelHTML(v, i, state) {
   const liked = state.likes?.[v.id];
   return `<section class="reel" data-i="${i}" style="--hue:${v.hue}"><div class="r-frame">
     <div class="r-stage"><div class="r-layers"></div><div class="r-over"></div><div class="r-hearts"></div>
@@ -158,9 +182,8 @@ function reelHTML(v, i, state, count) {
     </div>
     <p class="r-cap" aria-live="polite"></p>
     <div class="r-end"><div class="end-card">
-      <i class="ph-fill ph-check-circle"></i><b>Nice. Video done.</b><span class="end-xp"></span>
-      <div class="end-btns"><button class="btn end-faq"><i class="ph-bold ph-question"></i>FAQ + quiz</button>
-      <button class="btn ghost end-replay">Replay</button>${i < count - 1 ? '<button class="btn ghost end-next">Next video</button>' : ''}</div>
+      <i class="ph-fill ph-check-circle"></i><b>Nice. Video done.</b><span class="end-xp"></span><p class="end-msg"></p>
+      <div class="end-btns"></div>
     </div></div>
   </div></section>`;
 }
@@ -285,6 +308,21 @@ class Player {
     if (first) this.ctx.addXP(15, this.el.querySelector('.end-card b'));
     else this.ctx.save();
     if (!this.muted.v) audio.sfx('win');
+    this.endButtons();
+    // Quiz first: pop it open automatically if it isn't passed yet.
+    if (!st.checks?.[this.v.id]) setTimeout(() => { if (this.ended && this.el.classList.contains('done')) this.openQuiz?.(); }, 1400);
+  }
+
+  endButtons() {
+    const passed = this.ctx.state.checks?.[this.v.id];
+    this.el.querySelector('.end-msg').textContent = passed ? 'Quiz passed. Ready for the next one.' : 'Pass the quick quiz to unlock what comes next.';
+    const box = this.el.querySelector('.end-btns');
+    box.innerHTML = passed
+      ? `<button class="btn end-next">${esc(this.ctx.nextInfo().label)}</button><button class="btn ghost end-replay">Replay</button>`
+      : `<button class="btn end-quiz"><i class="ph-bold ph-target"></i>Take the quiz</button><button class="btn ghost end-replay">Replay</button>`;
+    box.querySelector('.end-replay').onclick = () => this.restart();
+    box.querySelector('.end-quiz') && (box.querySelector('.end-quiz').onclick = () => this.openQuiz());
+    box.querySelector('.end-next') && (box.querySelector('.end-next').onclick = () => this.goOn());
   }
 
   like(btn, e) {

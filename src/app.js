@@ -1,15 +1,15 @@
-import { ASSESSMENT, LESSONS, PATH } from './content.js?v=11';
-import * as cloud from './cloud.js?v=11';
-import * as voice from './speech.js?v=11';
-import * as jio from './mascot.js?v=11';
-import * as audio from './audio.js?v=11';
-import { hasGen, make } from './gen.js?v=11';
-import { GAMES, play } from './games.js?v=11';
-import { confetti, confettiFrom } from './fx.js?v=11';
-import { VIDEOS } from './history.js?v=11';
-import { scene } from './scene.js?v=11';
-import { openFeed } from './feed.js?v=11';
-import { SUBJECTS, PASS, units, walk, progress, questions } from './path.js?v=11';
+import { ASSESSMENT, LESSONS, PATH } from './content.js?v=12';
+import * as cloud from './cloud.js?v=12';
+import * as voice from './speech.js?v=12';
+import * as jio from './mascot.js?v=12';
+import * as audio from './audio.js?v=12';
+import { hasGen, make } from './gen.js?v=12';
+import { GAMES, play } from './games.js?v=12';
+import { confetti, confettiFrom } from './fx.js?v=12';
+import { VIDEOS } from './history.js?v=12';
+import { scene } from './scene.js?v=12';
+import { openFeed } from './feed.js?v=12';
+import { SUBJECTS, PASS, units, walk, progress, questions } from './path.js?v=12';
 
 // ── State ──────────────────────────────────────────────────────────────
 // Each role saves to its own local key so a debug session never touches Atchi's save.
@@ -442,8 +442,15 @@ function watch(id) {
   audio.sfx('tap');
   voice.stop();
   const ids = walk('history', state).units.flatMap((u) => u.nodes).filter((n) => n.type === 'video' && n.open).map((n) => n.id);
-  say('Watch to the end to unlock the next one.', 'happy', 2200);
-  openFeed({ state, save, addXP, log: (a) => cloud.logAnswer(a), onClose: () => home() }, id, ids);
+  say('Watch it, then pass the quick quiz to unlock the next one.', 'happy', 2400);
+  openFeed({
+    state, save, addXP, log: (a) => cloud.logAnswer(a), onClose: () => home(),
+    nextInfo: () => {
+      const c = walk('history', state).current;
+      return { label: !c ? 'Back to path' : c.type === 'video' ? `Next: ${c.title}` : c.type === 'test' ? 'Take the unit test' : c.title };
+    },
+    goNext: () => goNext('history'),
+  }, id, ids);
 }
 
 // ── Home: one path at a time ───────────────────────────────────────────

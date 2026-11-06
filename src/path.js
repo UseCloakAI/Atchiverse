@@ -1,8 +1,8 @@
 // Path model. Every subject is one ordered path of units.
 // Unit = lessons (or videos) in order → review → unit test. Passing the test unlocks the next unit.
-import { ASSESSMENT, LESSONS, PATH } from './content.js?v=11';
-import { VIDEOS, HIST_PATH } from './history.js?v=11';
-import { hasGen, make } from './gen.js?v=11';
+import { ASSESSMENT, LESSONS, PATH } from './content.js?v=12';
+import { VIDEOS, HIST_PATH } from './history.js?v=12';
+import { hasGen, make } from './gen.js?v=12';
 
 export const SUBJECTS = {
   math: { name: 'Math', icon: 'ph-calculator' },
@@ -35,8 +35,9 @@ export function units(subject) {
   }));
 }
 
-export const isDone = (node, st) => node.type === 'video' ? !!st.watched?.[node.id] : (st.mastery?.[node.id] || 0) >= 1;
-export const starsOf = (node, st) => node.type === 'video' ? (st.watched?.[node.id] ? (st.checks?.[node.id] ? 3 : 2) : 0) : st.mastery?.[node.id] || 0;
+// A video counts once it's watched AND its quiz is passed.
+export const isDone = (node, st) => node.type === 'video' ? !!(st.watched?.[node.id] && st.checks?.[node.id]) : (st.mastery?.[node.id] || 0) >= 1;
+export const starsOf = (node, st) => node.type === 'video' ? (st.watched?.[node.id] && st.checks?.[node.id] ? 3 : 0) : st.mastery?.[node.id] || 0;
 
 // Units with progress: each node gets done / open / current; each unit gets open.
 export function walk(subject, st) {

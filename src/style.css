@@ -878,3 +878,9 @@ body.jio-talking .reel .mini-jio { animation: talk .26s ease-in-out infinite alt
 .a-route { animation: flow 1.6s linear infinite; }
 @media (prefers-reduced-motion: reduce) { .a-river { stroke-dashoffset: 0; } }
 .credit { margin: 16px 0 0; text-align: center; color: var(--muted); font-size: .78rem; font-weight: 600; }
+.end-msg { margin: 0; color: var(--muted); font-weight: 600; font-size: .95rem; }
+.quiz-next { width: 100%; justify-content: center; margin-top: 14px; }
+.chk-res .link { padding: 0; font-size: inherit; color: inherit; }
+.quiz-next, .end-btns .btn { white-space: normal; height: auto; min-height: 54px; padding: 12px 22px; line-height: 1.2; text-align: center; }
+.chk-grid .choice.right { background: var(--good-soft); }
+.chk-grid .choice.wrong { background: var(--bad-soft); }
