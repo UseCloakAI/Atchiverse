@@ -32,6 +32,10 @@ export async function load() {
   catch (e) { if (e.status === 400) logout(); return null; }
 }
 
+export async function overview() {
+  return rpc('parent_overview', { p_token: token() });
+}
+
 let saveTimer;
 export function save(progress) {
   if (!token()) return;

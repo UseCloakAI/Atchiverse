@@ -129,8 +129,8 @@ export const LESSONS = {
 
   // ── Math backfill + grade-level ────────────────────────────────────────
   'add-20': {
-    title: 'Make a 10', subject: 'math', g: 1,
-    hook: 'Adding to 20 is easier if you fill up to 10 first, then add the rest.',
+    title: 'Jump Past 10', subject: 'math', g: 1,
+    hook: 'Adding past 10? Fill up to 10 first, then add what\'s left. Way easier than counting on fingers.',
     example: '7 + 5 → 7 + 3 = 10 → 10 + 2 = 12',
     practice: [
       { q: '8 + 6 = ?', a: '14', choices: ['13', '14', '15', '86'] },
@@ -310,4 +310,76 @@ export const LESSONS = {
       { q: 'Best evidence for "Sleep matters"?', a: 'Sleep helps your brain remember', choices: ['Beds are soft', 'Sleep helps your brain remember', 'Night is dark', 'Pillows are nice'] },
     ],
   },
+  // ── Added from Atchi's results: math facts are the gap ─────────────────
+  'make-10': {
+    title: 'Ten Partners', subject: 'math', g: 1,
+    hook: 'Some numbers are partners: together they make 10. Know these cold and adding gets way faster.',
+    example: '1+9   2+8   3+7   4+6   5+5',
+  },
+  'doubles': {
+    title: 'Doubles Trick', subject: 'math', g: 1,
+    hook: 'Doubles are easy to remember. Use them as a shortcut: 6 + 7 is just 6 + 6, plus 1.',
+    example: '6 + 7 → 6 + 6 = 12 → one more → 13',
+  },
+  'fact-families': {
+    title: 'Fact Families', subject: 'math', g: 2,
+    hook: 'Plus and minus are a team. If you know 8 + 6 = 14, you already know 14 − 6 and 14 − 8.',
+    example: '8 + 6 = 14 → 14 − 6 = 8 → 14 − 8 = 6',
+  },
+  'mult-easy': {
+    title: 'Times 2, 5, 10', subject: 'math', g: 3,
+    hook: 'Start with the easy tables. 2s are doubles, 5s end in 5 or 0, 10s just add a zero.',
+    example: '5 × 7 → 5, 10, 15, 20, 25, 30, 35 → 35',
+  },
+  'mult-mid': {
+    title: 'Times 3 and 4', subject: 'math', g: 3,
+    hook: 'Times 4 is just double, then double again. Times 3 is the number plus its double.',
+    example: '4 × 6 → double 6 = 12 → double 12 = 24',
+  },
+  'mult-hard': {
+    title: 'Times 6 to 9', subject: 'math', g: 3,
+    hook: 'Break the big ones into pieces you already know. 7 × 8 is 5 × 8 plus 2 × 8.',
+    example: '7 × 8 → 5 × 8 = 40, 2 × 8 = 16 → 40 + 16 = 56',
+  },
+  'spelling': {
+    title: 'Tricky Spellings', subject: 'reading', g: 2,
+    hook: "Some words don't spell the way they sound. You just have to know them. Look for the weird part.",
+    example: 'because (the "au")   friend (i before e)   said (the "ai")',
+    practice: [
+      { q: 'Which is spelled right?', a: 'because', choices: ['becaus', 'becuz', 'because', 'beacuse'] },
+      { q: 'Which is spelled right?', a: 'friend', choices: ['freind', 'friend', 'frend', 'freand'] },
+      { q: 'Which is spelled right?', a: 'people', choices: ['peple', 'poeple', 'people', 'peeple'] },
+      { q: 'Which is spelled right?', a: 'enough', choices: ['enuff', 'enough', 'enugh', 'inough'] },
+      { q: 'Which is spelled right?', a: 'their', choices: ['thier', 'their', 'thir', 'theyr'] },
+    ],
+  },
+  'suffixes': {
+    title: 'Word Endings', subject: 'reading', g: 3,
+    hook: 'A suffix goes at the end and changes the meaning. -ful = full of, -less = without, -er = a person who.',
+    example: 'help + ful = helpful   fear + less = fearless   teach + er = teacher',
+    practice: [
+      { q: '"Careless" means…', a: 'without care', choices: ['full of care', 'without care', 'cares again', 'cares a lot'] },
+      { q: 'A person who paints is a…', a: 'painter', choices: ['painty', 'painter', 'painless', 'painful'] },
+      { q: '"Joyful" means…', a: 'full of joy', choices: ['no joy', 'full of joy', 'joy again', 'a joy maker'] },
+      { q: '"Quickly" tells you…', a: 'how it was done', choices: ['who did it', 'how it was done', 'where it was', 'when it was'] },
+    ],
+  },
+};
+
+// The path. Order is the curriculum: work top to bottom in each subject.
+// Math rebuilt from Atchi's answers: facts within 20 first (his main gap), then times tables before division.
+export const PATH = {
+  math: [
+    { unit: 'Number sense', skills: ['make-10', 'doubles', 'add-20', 'sub-20', 'fact-families'] },
+    { unit: 'Big numbers', skills: ['place-value', 'add-regroup', 'sub-regroup'] },
+    { unit: 'Times and divide', skills: ['mult-easy', 'mult-mid', 'mult-hard', 'div-facts', 'multi-digit-mult'] },
+    { unit: 'Fractions and decimals', skills: ['fractions-intro', 'equiv-fractions', 'fraction-add', 'decimals'] },
+    { unit: 'Grade 6', skills: ['ratios', 'negatives'] },
+  ],
+  reading: [
+    { unit: 'Sounds and spelling', skills: ['short-vowels', 'sight-words', 'spelling', 'long-vowels'] },
+    { unit: 'Word parts', skills: ['compound-words', 'prefixes', 'suffixes'] },
+    { unit: 'Word meaning', skills: ['context-clues', 'synonyms', 'figurative'] },
+    { unit: 'Big ideas', skills: ['main-idea-short', 'inference', 'theme', 'author-purpose', 'evidence'] },
+  ],
 };

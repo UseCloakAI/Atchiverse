@@ -5,7 +5,9 @@ const reduce = matchMedia('(prefers-reduced-motion: reduce)');
 const el = document.createElement('div');
 el.className = 'jio';
 el.dataset.mood = 'idle';
-el.setAttribute('aria-hidden', 'true');
+el.setAttribute('role', 'button');
+el.setAttribute('aria-label', 'Jio');
+el.tabIndex = 0;
 el.innerHTML = `
   <div class="jio-float">
     <div class="jio-body">
@@ -49,6 +51,11 @@ addEventListener('pointermove', (e) => {
   tx = (dx / d) * 9 * k; ty = (dy / d) * 7 * k;
   if (!raf) raf = requestAnimationFrame(() => { eyes.style.transform = `translate(${tx}px, ${ty}px)`; raf = 0; });
 }, { passive: true });
+
+// Tap Jio: squish + let the app say something.
+const poke = () => { mood('cheer', 900); dispatchEvent(new CustomEvent('jio:poke')); };
+el.addEventListener('click', poke);
+el.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); poke(); } });
 
 // Talk while audio plays.
 addEventListener('jio:talk', (e) => el.classList.toggle('talking', e.detail));
