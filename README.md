@@ -3,7 +3,9 @@
 Personalized learning for Atchi — built to work *with* ADHD, not against it. Targets CA 6th grade with backfill from grade 1–2 gaps.
 
 ## Run
-Static site, no build. `python3 -m http.server` → open `localhost:8000`.
+Live: https://usecloakai.github.io/Atchiverse/ — auto-deploys on push to `main` via `.github/workflows/pages.yml`.
+
+Local: Static site, no build. `python3 -m http.server` → open `localhost:8000`.
 
 ## What's in
 - **Adaptive level check** — 6 math + 6 reading Qs, walks grade 1–6 up/down to find his level.
