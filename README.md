@@ -1,4 +1,6 @@
-# Atchiverse 🪐
+# Jio
+
+_(repo: Atchiverse)_
 
 Personalized learning for Atchi — built to work *with* ADHD, not against it. Targets CA 6th grade with backfill from grade 1–2 gaps.
 
@@ -12,7 +14,9 @@ Local: Static site, no build. `python3 -m http.server` → open `localhost:8000`
 - **Missions** — 3‑min lessons (hook → example → 3 practice), picked from missed skills + next grade up.
 - **ADHD-friendly** — XP, streaks, stars, instant feedback, brain break every 8 min, short chunks.
 - **PIN login** → progress + every answer synced to Supabase (`answers` table).
-- **Read-aloud** — 🔊 on every card + auto-read toggle (Cloak TTS, browser voice fallback).
+- **Jio the orb** — mascot that reacts (happy, cheer, sad, thinking, talking) and follows the cursor.
+- **Read-aloud** — speaker on every card + auto-read toggle (Cloak TTS, browser voice fallback). Voice boost up to 300%.
+- **Sound** — synthesized SFX + settings sheet for voice / SFX volume.
 - 27 lessons covering every skill the level check tests.
 
 Content lives in `src/content.js`.

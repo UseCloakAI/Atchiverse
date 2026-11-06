@@ -2,16 +2,45 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Atchiverse</title>
-  <link rel="stylesheet" href="src/style.css?v=3" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#f2f3f7" media="(prefers-color-scheme: light)" />
+  <meta name="theme-color" content="#111016" media="(prefers-color-scheme: dark)" />
+  <title>Jio</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource-variable/bricolage-grotesque@5.1.0/index.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/bold/style.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/fill/style.css" />
+  <link rel="stylesheet" href="src/style.css?v=5" />
 </head>
 <body>
-  <header>
-    <h1>🪐 Atchiverse</h1>
-    <div class="hud"><button id="read" class="toggle" aria-label="Auto read aloud">🔇 Off</button><span id="streak">🔥 0</span><span id="xp">⚡ 0 XP</span></div>
+  <header class="top">
+    <div class="brand"><span class="brand-dot"></span>jio</div>
+    <div class="stats">
+      <span class="chip" id="streak"><i class="ph-fill ph-fire"></i><span>0</span></span>
+      <span class="chip" id="xp"><i class="ph-fill ph-lightning"></i><span>0</span><span class="lbl">XP</span></span>
+      <button class="chip" id="read" aria-pressed="false" aria-label="Read questions out loud"><i class="ph-bold ph-speaker-high"></i><span class="lbl">Read to me</span></button>
+      <button class="chip icon-only" id="gear" aria-label="Sound settings"><i class="ph-bold ph-sliders-horizontal"></i></button>
+    </div>
   </header>
-  <main id="app"></main>
-  <script type="module" src="src/app.js?v=3"></script>
+  <div class="shell">
+    <aside class="stage" id="stage"><p class="bubble" id="bubble" aria-live="polite">Hey!</p></aside>
+    <main id="app"></main>
+  </div>
+  <dialog class="sheet" id="settings" aria-labelledby="set-title">
+    <form method="dialog">
+      <div class="sheet-head"><h2 id="set-title">Sound</h2><button class="spk" value="close" aria-label="Close"><i class="ph-bold ph-x"></i></button></div>
+      <div class="field">
+        <div class="field-top"><label for="vol-voice"><i class="ph-bold ph-microphone"></i>Voice volume</label><output id="out-voice">200%</output></div>
+        <input type="range" id="vol-voice" min="0" max="3" step="0.1" />
+        <button type="button" class="link" id="test-voice">Test voice</button>
+      </div>
+      <div class="field">
+        <div class="field-top"><label for="vol-sfx"><i class="ph-bold ph-music-notes"></i>Sound effects</label><output id="out-sfx">70%</output></div>
+        <input type="range" id="vol-sfx" min="0" max="1" step="0.05" />
+        <button type="button" class="link" id="test-sfx">Test sound</button>
+      </div>
+      <label class="switch"><span><i class="ph-bold ph-speaker-high"></i>Read everything out loud</span><input type="checkbox" id="auto-read" /><span class="track"></span></label>
+    </form>
+  </dialog>
+  <script type="module" src="src/app.js?v=5"></script>
 </body>
 </html>
